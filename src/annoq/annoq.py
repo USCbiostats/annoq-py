@@ -39,5 +39,34 @@ class annoq:
         response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
 
         data = json.loads(response.text)
-        snps_by_chromosome = data['data']['GetSNPsByChromosome']
-        return snps_by_chromosome
+        return data['data']['GetSNPsByChromosome']
+    
+
+    def GetSNPsByGeneProduct(self, gene, fields, filter=None, page_from=None, page_size=None):
+        fields_str = ''
+        for elt in fields:
+            fields_str += elt + '\n'
+        base = f"""
+                query MyQuery {{
+                    GetSNPsByGeneProduct(gene: {json.dumps(gene)}
+                """
+        if filter != None:
+            base += f"""
+                    , filter_args: {{exists: {json.dumps(filter)}}}
+                    """
+        if page_from != None and page_size != None:
+            base += f"""
+                    , page_args: {{from_: {page_from}, size: {page_size}}}
+                    """
+            
+        query = base + f"""
+            ) {{
+                    {fields_str}
+                }}
+            }}
+            """
+
+        response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
+
+        data = json.loads(response.text)
+        return data['data']['GetSNPsByGeneProduct']
