@@ -12,13 +12,25 @@ class annoq:
         return "chr"
 
 
-    def GetSNPsByChromosome(self, chr, start, end, fields):
+    def GetSNPsByChromosome(self, chr, start, end, fields, filter=None, page_from=None, page_size=None):
         fields_str = ''
         for elt in fields:
             fields_str += elt + '\n'
-        query = f"""
-            query MyQuery {{
-                GetSNPsByChromosome(chr: {json.dumps(chr)}, end: {end}, start: {start}) {{
+        base = f"""
+                query MyQuery {{
+                    GetSNPsByChromosome(chr: {json.dumps(chr)}, end: {end}, start: {start}
+                """
+        if filter != None:
+            base += f"""
+                    , filter_args: {{exists: {json.dumps(filter)}}}
+                    """
+        if page_from != None and page_size != None:
+            base += f"""
+                    , page_args: {{from_: {page_from}, size: {page_size}}}
+                    """
+            
+        query = base + f"""
+            ) {{
                     {fields_str}
                 }}
             }}
