@@ -21,6 +21,8 @@ python
 ## Get SNP Chromosome Query
 GetSNPsByChromosome(self, chr, start, end, fields, filter=None, page_from=None, page_size=None)
 
+Returns list of json
+
 #### Parameters
 
 **chr (str)** -  Chromosome string
@@ -44,6 +46,8 @@ annoq().GetSNPsByChromosome(chr="2", start=1, end=10000000, fields=['chr', 'ref'
 ## Get SNP Gene Product Query
 GetSNPsByGeneProduct(self, gene, fields, filter=None, page_from=None, page_size=None)
 
+Returns list of json
+
 #### Parameters 
 
 **gene (str)** -  Gene product string
@@ -62,6 +66,8 @@ annoq().GetSNPsByGeneProduct(gene="Q9BVC4", fields=["chr", "id"], filter=["chr",
 
 ## Get SNP ID Query
 GetSNPsByIDs(self, ids, fields, filter=None, page_from=None, page_size=None)
+
+Returns list of json
 
 #### Parameters 
 
@@ -82,6 +88,8 @@ annoq().GetSNPsByIDs(ids=["2:10632C>A", "2:10632C>A"], fields=["id", "chr"], fil
 ## Get SNP RsID Query
 GetSNPsByRsID(self, rsID, fields, filter=None, page_from=None, page_size=None)
 
+Returns list of json
+
 #### Parameters 
 
 **rsID (str)** -  rsID string
@@ -101,6 +109,8 @@ annoq().GetSNPsByRsID(rsID='rs189126619', fields=["rs_dbSNP151", "ref"], filter=
 ## Get SNP RsIDs Query
 GetSNPsByRsIDs(self, rsIDs, fields, filter=None, page_from=None, page_size=None)
 
+Returns list of json
+
 #### Parameters 
 
 **rsIDs (list[str])** -  list of rsIDs
@@ -119,6 +129,8 @@ annoq().GetSNPsByRsIDs(rsIDs=['rs189126619', 'rs115366554'], fields=["rs_dbSNP15
 
 ## Count SNP Chromosome Query
 CountSNPsByChromosome(self, chr, start, end)
+
+return int
 
 #### Parameters
 

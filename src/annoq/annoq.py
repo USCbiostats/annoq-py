@@ -158,12 +158,17 @@ class annoq:
         return data['data']['GetSNPsByRsIDs']
     
 
-    def CountSNPsByChromosome(self, chr, start, end):
+    def CountSNPsByChromosome(self, chr, start, end, filter=None):
         query = f"""
                 query MyQuery {{
-                    CountSNPsByChromosome(chr: {json.dumps(chr)}, end: {end}, start: {start})
-                    }}
+                    CountSNPsByChromosome(chr: {json.dumps(chr)}, end: {end}, start: {start}
                 """
+        
+        if filter != None:
+            query += f"""
+                    , filter_args: {{exists: {json.dumps(filter)}}})
+                    }}
+                    """
 
         response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
 
