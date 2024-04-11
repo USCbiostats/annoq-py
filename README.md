@@ -18,7 +18,7 @@ python
 >>> from src.annoq import annoq
 ```
 
-## SNP Chromosome Query
+## Get SNP Chromosome Query
 GetSNPsByChromosome(self, chr, start, end, fields, filter=None, page_from=None, page_size=None)
 
 #### Parameters
@@ -41,7 +41,7 @@ annoq().GetSNPsByChromosome(chr="2", start=1, end=10000000, fields=['chr', 'ref'
 ```
 
 
-## SNP Gene Product Query
+## Get SNP Gene Product Query
 GetSNPsByGeneProduct(self, gene, fields, filter=None, page_from=None, page_size=None)
 
 #### Parameters 
@@ -60,7 +60,7 @@ GetSNPsByGeneProduct(self, gene, fields, filter=None, page_from=None, page_size=
 annoq().GetSNPsByGeneProduct(gene="Q9BVC4", fields=["chr", "id"], filter=["chr", "pos"], page_from=0, page_size=10)
 ```
 
-## SNP ID Query
+## Get SNP ID Query
 GetSNPsByIDs(self, ids, fields, filter=None, page_from=None, page_size=None)
 
 #### Parameters 
@@ -79,7 +79,7 @@ GetSNPsByIDs(self, ids, fields, filter=None, page_from=None, page_size=None)
 annoq().GetSNPsByIDs(ids=["2:10632C>A", "2:10632C>A"], fields=["id", "chr"], filter=["chr"], page_from=0, page_size=5)
 ```
 
-## SNP RsID Query
+## Get SNP RsID Query
 GetSNPsByRsID(self, rsID, fields, filter=None, page_from=None, page_size=None)
 
 #### Parameters 
@@ -98,7 +98,7 @@ GetSNPsByRsID(self, rsID, fields, filter=None, page_from=None, page_size=None)
 annoq().GetSNPsByRsID(rsID='rs189126619', fields=["rs_dbSNP151", "ref"], filter=["rs_dbSNP151"], page_from=0, page_size=2)
 ```
 
-## SNP RsIDs Query
+## Get SNP RsIDs Query
 GetSNPsByRsIDs(self, rsIDs, fields, filter=None, page_from=None, page_size=None)
 
 #### Parameters 
@@ -115,4 +115,19 @@ GetSNPsByRsIDs(self, rsIDs, fields, filter=None, page_from=None, page_size=None)
 
 ```
 annoq().GetSNPsByRsIDs(rsIDs=['rs189126619', 'rs115366554'], fields=["rs_dbSNP151", "ref"], filter=["rs_dbSNP151"], page_from=0, page_size=2)
+```
+
+## Count SNP Chromosome Query
+CountSNPsByChromosome(self, chr, start, end)
+
+#### Parameters
+
+**chr (str)** -  Chromosome string
+
+**start (int)** - Start of chromosome
+
+**end (int)** - End of chromosome
+
+```
+annoq().CountSNPsByChromosome("2", 1, 10000000)
 ```

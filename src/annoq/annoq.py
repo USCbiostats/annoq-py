@@ -156,3 +156,16 @@ class annoq:
 
         data = json.loads(response.text)
         return data['data']['GetSNPsByRsIDs']
+    
+
+    def CountSNPsByChromosome(self, chr, start, end):
+        query = f"""
+                query MyQuery {{
+                    CountSNPsByChromosome(chr: {json.dumps(chr)}, end: {end}, start: {start})
+                    }}
+                """
+
+        response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
+
+        data = json.loads(response.text)
+        return data['data']['CountSNPsByChromosome']
