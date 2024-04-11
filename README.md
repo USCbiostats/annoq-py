@@ -33,7 +33,7 @@ Returns list of json
 
 **fields (list[str])** - List of strings with the fields that you
 
-**filters (list[str])** - List of strings with fields that you want to filter on
+**filter (list[str])** - List of strings with fields that you want to filter on
 
 **page_from (int)** - Starting page number
 
@@ -54,7 +54,7 @@ Returns list of json
 
 **fields (list[str])** - List of strings with the fields that you
 
-**filters (list[str])** - List of strings with fields that you want to filter on
+**filter (list[str])** - List of strings with fields that you want to filter on
 
 **page_from (int)** - Starting page number
 
@@ -75,7 +75,7 @@ Returns list of json
 
 **fields (list[str])** - List of strings with the fields that you
 
-**filters (list[str])** - List of strings with fields that you want to filter on
+**filter (list[str])** - List of strings with fields that you want to filter on
 
 **page_from (int)** - Starting page number
 
@@ -96,7 +96,7 @@ Returns list of json
 
 **fields (list[str])** - List of strings with the fields that you
 
-**filters (list[str])** - List of strings with fields that you want to filter on
+**filter (list[str])** - List of strings with fields that you want to filter on
 
 **page_from (int)** - Starting page number
 
@@ -117,7 +117,7 @@ Returns list of json
 
 **fields (list[str])** - List of strings with the fields that you
 
-**filters (list[str])** - List of strings with fields that you want to filter on
+**filter (list[str])** - List of strings with fields that you want to filter on
 
 **page_from (int)** - Starting page number
 
@@ -128,7 +128,7 @@ annoq().GetSNPsByRsIDs(rsIDs=['rs189126619', 'rs115366554'], fields=["rs_dbSNP15
 ```
 
 ## Count SNP by Chromosome Query
-CountSNPsByChromosome(self, chr, start, end)
+CountSNPsByChromosome(self, chr, start, end, filter)
 
 return int
 
@@ -140,14 +140,14 @@ return int
 
 **end (int)** - End of chromosome
 
-**filters (list[str])** - List of strings with fields that you want to filter on
+**filter (list[str])** - List of strings with fields that you want to filter on
 
 ```
 annoq().CountSNPsByChromosome(chr="2", start=1, end=10000000, filter=["chr", "ANNOVAR_ensembl_Closest_gene(intergenic_only)"])
 ```
 
 ## Count SNP by Gene Product Query
-CountSNPsByGeneProduct(self, chr, start, end)
+CountSNPsByGeneProduct(self, gene, filter)
 
 return int
 
@@ -155,14 +155,14 @@ return int
 
 **gene (str)** -  Gene product string
 
-**filters (list[str])** - List of strings with fields that you want to filter on
+**filter (list[str])** - List of strings with fields that you want to filter on
 
 ```
 annoq().CountSNPsByGeneProduct(gene="Q9BVC4", filter=["chr", "pos"])
 ```
 
 ## Count SNP by ID Query
-CountSNPsByIDs(self, chr, start, end)
+CountSNPsByIDs(self, ids, filter)
 
 return int
 
@@ -170,8 +170,23 @@ return int
 
 **ids (list[str])** -  List of IDs
 
-**filters (list[str])** - List of strings with fields that you want to filter on
+**filter (list[str])** - List of strings with fields that you want to filter on
 
 ```
 annoq().CountSNPsByIDs(ids=["2:10632C>A", "2:10632C>A"], filter=["chr"])
+```
+
+## Count SNP by RsID Query
+CountSNPsByRsID(self, rsID, filter)
+
+return int
+
+#### Parameters
+
+**rsID (str)** -  rsID string
+
+**filter (list[str])** - List of strings with fields that you want to filter on
+
+```
+annoq().CountSNPsByRsID(rsID='rs189126619', filter=["rs_dbSNP151"])
 ```

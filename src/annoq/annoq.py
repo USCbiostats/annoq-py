@@ -210,3 +210,21 @@ class annoq:
 
         data = json.loads(response.text)
         return data['data']['CountSNPsByIDs']
+    
+
+    def CountSNPsByRsID(self, rsID, filter=None):
+        query = f"""
+                query MyQuery {{
+                    CountSNPsByRsID(rsID: {json.dumps(rsID)}
+                """
+        
+        if filter != None:
+            query += f"""
+                    , filter_args: {{exists: {json.dumps(filter)}}})
+                    }}
+                    """
+
+        response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
+
+        data = json.loads(response.text)
+        return data['data']['CountSNPsByRsID']
