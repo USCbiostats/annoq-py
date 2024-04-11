@@ -18,7 +18,7 @@ python
 >>> from src.annoq import annoq
 ```
 
-## Get SNP Chromosome Query
+## Get SNP by Chromosome Query
 GetSNPsByChromosome(self, chr, start, end, fields, filter=None, page_from=None, page_size=None)
 
 Returns list of json
@@ -43,7 +43,7 @@ annoq().GetSNPsByChromosome(chr="2", start=1, end=10000000, fields=['chr', 'ref'
 ```
 
 
-## Get SNP Gene Product Query
+## Get SNP by Gene Product Query
 GetSNPsByGeneProduct(self, gene, fields, filter=None, page_from=None, page_size=None)
 
 Returns list of json
@@ -64,7 +64,7 @@ Returns list of json
 annoq().GetSNPsByGeneProduct(gene="Q9BVC4", fields=["chr", "id"], filter=["chr", "pos"], page_from=0, page_size=10)
 ```
 
-## Get SNP ID Query
+## Get SNP by ID Query
 GetSNPsByIDs(self, ids, fields, filter=None, page_from=None, page_size=None)
 
 Returns list of json
@@ -85,7 +85,7 @@ Returns list of json
 annoq().GetSNPsByIDs(ids=["2:10632C>A", "2:10632C>A"], fields=["id", "chr"], filter=["chr"], page_from=0, page_size=5)
 ```
 
-## Get SNP RsID Query
+## Get SNP by RsID Query
 GetSNPsByRsID(self, rsID, fields, filter=None, page_from=None, page_size=None)
 
 Returns list of json
@@ -106,7 +106,7 @@ Returns list of json
 annoq().GetSNPsByRsID(rsID='rs189126619', fields=["rs_dbSNP151", "ref"], filter=["rs_dbSNP151"], page_from=0, page_size=2)
 ```
 
-## Get SNP RsIDs Query
+## Get SNP by RsIDs Query
 GetSNPsByRsIDs(self, rsIDs, fields, filter=None, page_from=None, page_size=None)
 
 Returns list of json
@@ -127,7 +127,7 @@ Returns list of json
 annoq().GetSNPsByRsIDs(rsIDs=['rs189126619', 'rs115366554'], fields=["rs_dbSNP151", "ref"], filter=["rs_dbSNP151"], page_from=0, page_size=2)
 ```
 
-## Count SNP Chromosome Query
+## Count SNP by Chromosome Query
 CountSNPsByChromosome(self, chr, start, end)
 
 return int
@@ -146,7 +146,7 @@ return int
 annoq().CountSNPsByChromosome(chr="2", start=1, end=10000000, filter=["chr", "ANNOVAR_ensembl_Closest_gene(intergenic_only)"])
 ```
 
-## Count SNP Gene Product Query
+## Count SNP by Gene Product Query
 CountSNPsByGeneProduct(self, chr, start, end)
 
 return int
@@ -159,4 +159,19 @@ return int
 
 ```
 annoq().CountSNPsByGeneProduct(gene="Q9BVC4", filter=["chr", "pos"])
+```
+
+## Count SNP by ID Query
+CountSNPsByIDs(self, chr, start, end)
+
+return int
+
+#### Parameters
+
+**ids (list[str])** -  List of IDs
+
+**filters (list[str])** - List of strings with fields that you want to filter on
+
+```
+annoq().CountSNPsByIDs(ids=["2:10632C>A", "2:10632C>A"], filter=["chr"])
 ```
