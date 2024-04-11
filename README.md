@@ -190,3 +190,18 @@ return int
 ```
 annoq().CountSNPsByRsID(rsID='rs189126619', filter=["rs_dbSNP151"])
 ```
+
+## Count SNP by RsIDs Query
+CountSNPsByRsID(self, rsIDs, filter)
+
+return int
+
+#### Parameters
+
+**rsIDs (list[str])** -  list of rsIDs
+
+**filter (list[str])** - List of strings with fields that you want to filter on
+
+```
+annoq().CountSNPsByRsIDs(rsIDs=['rs189126619', 'rs115366554'], filter=["rs_dbSNP151"])
+```
