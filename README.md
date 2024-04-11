@@ -97,3 +97,22 @@ GetSNPsByRsID(self, rsID, fields, filter=None, page_from=None, page_size=None)
 ```
 annoq().GetSNPsByRsID(rsID='rs189126619', fields=["rs_dbSNP151", "ref"], filter=["rs_dbSNP151"], page_from=0, page_size=2)
 ```
+
+## SNP RsIDs Query
+GetSNPsByRsIDs(self, rsIDs, fields, filter=None, page_from=None, page_size=None)
+
+#### Parameters 
+
+**rsIDs (list[str])** -  list of rsIDs
+
+**fields (list[str])** - List of strings with the fields that you
+
+**filters (list[str])** - List of strings with fields that you want to filter on
+
+**page_from (int)** - Starting page number
+
+**page_size (int)** - Size of the page
+
+```
+annoq().GetSNPsByRsIDs(rsIDs=['rs189126619', 'rs115366554'], fields=["rs_dbSNP151", "ref"], filter=["rs_dbSNP151"], page_from=0, page_size=2)
+```
