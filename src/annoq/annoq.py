@@ -156,3 +156,93 @@ class annoq:
 
         data = json.loads(response.text)
         return data['data']['GetSNPsByRsIDs']
+    
+
+    def CountSNPsByChromosome(self, chr, start, end, filter=None):
+        query = f"""
+                query MyQuery {{
+                    CountSNPsByChromosome(chr: {json.dumps(chr)}, end: {end}, start: {start}
+                """
+        
+        if filter != None:
+            query += f"""
+                    , filter_args: {{exists: {json.dumps(filter)}}})
+                    }}
+                    """
+
+        response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
+
+        data = json.loads(response.text)
+        return data['data']['CountSNPsByChromosome']
+    
+
+    def CountSNPsByGeneProduct(self, gene, filter=None):
+        query = f"""
+                query MyQuery {{
+                    CountSNPsByGeneProduct(gene: {json.dumps(gene)}
+                """
+        
+        if filter != None:
+            query += f"""
+                    , filter_args: {{exists: {json.dumps(filter)}}})
+                    }}
+                    """
+
+        response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
+
+        data = json.loads(response.text)
+        return data['data']['CountSNPsByGeneProduct']
+    
+
+    def CountSNPsByIDs(self, ids, filter=None):
+        query = f"""
+                query MyQuery {{
+                    CountSNPsByIDs(ids: {json.dumps(ids)}
+                """
+        
+        if filter != None:
+            query += f"""
+                    , filter_args: {{exists: {json.dumps(filter)}}})
+                    }}
+                    """
+
+        response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
+
+        data = json.loads(response.text)
+        return data['data']['CountSNPsByIDs']
+    
+
+    def CountSNPsByRsID(self, rsID, filter=None):
+        query = f"""
+                query MyQuery {{
+                    CountSNPsByRsID(rsID: {json.dumps(rsID)}
+                """
+        
+        if filter != None:
+            query += f"""
+                    , filter_args: {{exists: {json.dumps(filter)}}})
+                    }}
+                    """
+
+        response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
+
+        data = json.loads(response.text)
+        return data['data']['CountSNPsByRsID']
+
+
+    def CountSNPsByRsIDs(self, rsIDs, filter=None):
+        query = f"""
+                query MyQuery {{
+                    CountSNPsByRsIDs(rsIDs: {json.dumps(rsIDs)}
+                """
+        
+        if filter != None:
+            query += f"""
+                    , filter_args: {{exists: {json.dumps(filter)}}})
+                    }}
+                    """
+
+        response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
+
+        data = json.loads(response.text)
+        return data['data']['CountSNPsByRsIDs']
