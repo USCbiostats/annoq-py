@@ -140,6 +140,23 @@ return int
 
 **end (int)** - End of chromosome
 
+**filters (list[str])** - List of strings with fields that you want to filter on
+
 ```
-annoq().CountSNPsByChromosome("2", 1, 10000000)
+annoq().CountSNPsByChromosome(chr="2", start=1, end=10000000, filter=["chr", "ANNOVAR_ensembl_Closest_gene(intergenic_only)"])
+```
+
+## Count SNP Gene Product Query
+CountSNPsByGeneProduct(self, chr, start, end)
+
+return int
+
+#### Parameters
+
+**gene (str)** -  Gene product string
+
+**filters (list[str])** - List of strings with fields that you want to filter on
+
+```
+annoq().CountSNPsByGeneProduct(gene="Q9BVC4", filter=["chr", "pos"])
 ```

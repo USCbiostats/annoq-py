@@ -174,3 +174,21 @@ class annoq:
 
         data = json.loads(response.text)
         return data['data']['CountSNPsByChromosome']
+    
+
+    def CountSNPsByGeneProduct(self, gene, filter=None):
+        query = f"""
+                query MyQuery {{
+                    CountSNPsByGeneProduct(gene: {json.dumps(gene)}
+                """
+        
+        if filter != None:
+            query += f"""
+                    , filter_args: {{exists: {json.dumps(filter)}}})
+                    }}
+                    """
+
+        response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
+
+        data = json.loads(response.text)
+        return data['data']['CountSNPsByGeneProduct']
