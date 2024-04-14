@@ -18,6 +18,11 @@ python
 >>> from src.annoq import annoq
 ```
 
+To run the tests
+```
+python -m pytest test/test.py
+```
+
 ## Get SNP by Chromosome Query
 GetSNPsByChromosome(self, chr, start, end, fields, filter=None, page_from=None, page_size=None)
 
