@@ -87,7 +87,7 @@ Returns list of json
 **page_size (int)** - Size of the page
 
 ```
-annoq().GetSNPsByIDs(ids=["2:10632C>A", "2:10632C>A"], fields=["id", "chr"], filter=["chr"], page_from=0, page_size=5)
+annoq().GetSNPsByIDs(ids=["2:10632C>A", "16:2255492G>A"], fields=["id", "chr"], filter=["chr"], page_from=0, page_size=5)
 ```
 
 ## Get SNP by RsID Query
@@ -197,7 +197,7 @@ annoq().CountSNPsByRsID(rsID='rs189126619', filter=["rs_dbSNP151"])
 ```
 
 ## Count SNP by RsIDs Query
-CountSNPsByRsID(self, rsIDs, filter)
+CountSNPsByRsIDs(self, rsIDs, filter)
 
 return int
 
