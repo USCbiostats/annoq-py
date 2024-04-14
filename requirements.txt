@@ -1,4 +1,3 @@
-annoq @ file:///home/akshala/Documents/USC/HSC_lab/annoQ/annoq-py
 certifi==2024.2.2
 charset-normalizer==3.3.2
 exceptiongroup==1.2.0
