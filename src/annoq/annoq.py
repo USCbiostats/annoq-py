@@ -177,10 +177,10 @@ class annoq:
             print('Unexpected error:', e)
     
 
-    def CountSNPsByChromosome(self, chr, start, end, filter=None):
+    def count_SNPs_by_chromosome(self, chr, start, end, filter=None):
         query = f"""
                 query MyQuery {{
-                    CountSNPsByChromosome(chr: {json.dumps(chr)}, end: {end}, start: {start}
+                    count_SNPs_by_chromosome(chr: {json.dumps(chr)}, end: {end}, start: {start}
                 """
         
         if filter != None:
@@ -192,13 +192,13 @@ class annoq:
         response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
 
         data = json.loads(response.text)
-        return data['data']['CountSNPsByChromosome']
+        return data['data']['count_SNPs_by_chromosome']
     
 
-    def CountSNPsByGeneProduct(self, gene, filter=None):
+    def count_SNPs_by_gene_product(self, gene, filter=None):
         query = f"""
                 query MyQuery {{
-                    CountSNPsByGeneProduct(gene: {json.dumps(gene)}
+                    count_SNPs_by_gene_product(gene: {json.dumps(gene)}
                 """
         
         if filter != None:
@@ -210,13 +210,13 @@ class annoq:
         response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
 
         data = json.loads(response.text)
-        return data['data']['CountSNPsByGeneProduct']
+        return data['data']['count_SNPs_by_gene_product']
     
 
-    def CountSNPsByIDs(self, ids, filter=None):
+    def count_SNPs_by_IDs(self, ids, filter=None):
         query = f"""
                 query MyQuery {{
-                    CountSNPsByIDs(ids: {json.dumps(ids)}
+                    count_SNPs_by_IDs(ids: {json.dumps(ids)}
                 """
         
         if filter != None:
@@ -228,13 +228,13 @@ class annoq:
         response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
 
         data = json.loads(response.text)
-        return data['data']['CountSNPsByIDs']
+        return data['data']['count_SNPs_by_IDs']
     
 
-    def CountSNPsByRsID(self, rsID, filter=None):
+    def count_SNPs_by_RsID(self, rsID, filter=None):
         query = f"""
                 query MyQuery {{
-                    CountSNPsByRsID(rsID: {json.dumps(rsID)}
+                    count_SNPs_by_RsID(rsID: {json.dumps(rsID)}
                 """
         
         if filter != None:
@@ -246,13 +246,13 @@ class annoq:
         response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
 
         data = json.loads(response.text)
-        return data['data']['CountSNPsByRsID']
+        return data['data']['count_SNPs_by_RsID']
 
 
-    def CountSNPsByRsIDs(self, rsIDs, filter=None):
+    def count_SNPs_by_RsIDs(self, rsIDs, filter=None):
         query = f"""
                 query MyQuery {{
-                    CountSNPsByRsIDs(rsIDs: {json.dumps(rsIDs)}
+                    count_SNPs_by_RsIDs(rsIDs: {json.dumps(rsIDs)}
                 """
         
         if filter != None:
@@ -264,4 +264,4 @@ class annoq:
         response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
 
         data = json.loads(response.text)
-        return data['data']['CountSNPsByRsIDs']
+        return data['data']['count_SNPs_by_RsIDs']
