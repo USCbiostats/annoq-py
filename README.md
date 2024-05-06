@@ -30,21 +30,23 @@ Returns list of json
 
 #### Parameters
 
-**chr (str)** -  Chromosome string
+**chr: str** -  Chromosome string
 
-**start (int)** - Start of chromosome
+**start: int** - Start of chromosome
 
-**end (int)** - End of chromosome
+**end: int** - End of chromosome
 
-**fields (list[str])** - List of strings with the fields that you
+**fields: list[str]** - List of strings with the fields that you
 
-**filter (list[str])** - List of strings with fields that you want to filter on
+**query_type_option: str (optional)** - The value for this is SNPS if scrolling is not needed and SCROLL if scrolling is needed. By default it is SNPS. 
 
-**page_from (int)** - Starting page number
+**filter: list[str] (optional)** - List of strings with fields that you want to filter on
 
-**page_size (int)** - Size of the page
+**page_from: int (optional)** - Starting page number
+
+**page_size: int (optional)** - Size of the page
 ```
-annoq().GetSNPsByChromosome(chr="2", start=1, end=10000000, fields=['chr', 'ref', 'pos', 'rs_dbSNP151', 'ANNOVAR_ensembl_Effect', 'ANNOVAR_refseq_Effect'], filter=['chr'], page_from=2, page_size=4)
+annoq().get_SNPs_by_chromosome(chr="2", start=1, end=10000000, fields=['chr', 'ref', 'pos', 'rs_dbSNP151', 'ANNOVAR_ensembl_Effect', 'ANNOVAR_refseq_Effect'], query_type_option='SCROLL', filter=['chr'], page_from=2, page_size=4)
 ```
 
 
@@ -55,18 +57,21 @@ Returns list of json
 
 #### Parameters 
 
-**gene (str)** -  Gene product string
+**gene: str** -  Gene product string
 
-**fields (list[str])** - List of strings with the fields that you
+**fields: list[str]** - List of strings with the fields that you
 
-**filter (list[str])** - List of strings with fields that you want to filter on
+**query_type_option: str (optional)** - The value for this is SNPS if scrolling is not needed and SCROLL if scrolling is needed. By default it is SNPS. 
 
-**page_from (int)** - Starting page number
 
-**page_size (int)** - Size of the page
+**filter: list[str] (optional)** - List of strings with fields that you want to filter on
+
+**page_from: int (optional)** - Starting page number
+
+**page_size: int (optional)** - Size of the page
 
 ```
-annoq().GetSNPsByGeneProduct(gene="Q9BVC4", fields=["chr", "id"], filter=["chr", "pos"], page_from=0, page_size=10)
+annoq().get_SNPs_by_gene_product(gene="Q9BVC4", fields=["chr", "id"], query_type_option='SCROLL', filter=["chr", "pos"], page_from=0, page_size=10)
 ```
 
 ## Get SNP by ID Query
@@ -76,18 +81,20 @@ Returns list of json
 
 #### Parameters 
 
-**ids (list[str])** -  List of IDs
+**ids: list[str]** -  List of IDs
 
-**fields (list[str])** - List of strings with the fields that you
+**fields: list[str]** - List of strings with the fields that you
 
-**filter (list[str])** - List of strings with fields that you want to filter on
+**query_type_option: str (optional)** - The value for this is SNPS if scrolling is not needed and SCROLL if scrolling is needed. By default it is SNPS. 
 
-**page_from (int)** - Starting page number
+**filter: list[str] (optional)** - List of strings with fields that you want to filter on
 
-**page_size (int)** - Size of the page
+**page_from: int (optional)** - Starting page number
+
+**page_size: int (optional)** - Size of the page
 
 ```
-annoq().GetSNPsByIDs(ids=["2:10632C>A", "16:2255492G>A"], fields=["id", "chr"], filter=["chr"], page_from=0, page_size=5)
+annoq().get_SNPs_by_IDs(ids=["2:10632C>A", "16:2255492G>A"], fields=["id", "chr"], query_type_option='SNPS', filter=["chr"], page_from=0, page_size=5)
 ```
 
 ## Get SNP by RsID Query
@@ -97,18 +104,20 @@ Returns list of json
 
 #### Parameters 
 
-**rsID (str)** -  rsID string
+**rsID: str** -  rsID string
 
-**fields (list[str])** - List of strings with the fields that you
+**fields: list[str]** - List of strings with the fields that you
 
-**filter (list[str])** - List of strings with fields that you want to filter on
+**query_type_option: str (optional)** - The value for this is SNPS if scrolling is not needed and SCROLL if scrolling is needed. By default it is SNPS. 
 
-**page_from (int)** - Starting page number
+**filter: list[str] (optional)** - List of strings with fields that you want to filter on
 
-**page_size (int)** - Size of the page
+**page_from: int (optional)** - Starting page number
+
+**page_size: int (optional)** - Size of the page
 
 ```
-annoq().GetSNPsByRsID(rsID='rs189126619', fields=["rs_dbSNP151", "ref"], filter=["rs_dbSNP151"], page_from=0, page_size=2)
+annoq().get_SNPs_by_RsID(rsID='rs189126619', fields=["rs_dbSNP151", "ref"], filter=["rs_dbSNP151"], page_from=0, page_size=2)
 ```
 
 ## Get SNP by RsIDs Query
@@ -118,95 +127,97 @@ Returns list of json
 
 #### Parameters 
 
-**rsIDs (list[str])** -  list of rsIDs
+**rsIDs: list[str]** -  list of rsIDs
 
-**fields (list[str])** - List of strings with the fields that you
+**fields: list[str]** - List of strings with the fields that you
 
-**filter (list[str])** - List of strings with fields that you want to filter on
+**query_type_option: str (optional)** - The value for this is SNPS if scrolling is not needed and SCROLL if scrolling is needed. By default it is SNPS. 
 
-**page_from (int)** - Starting page number
+**filter: list[str] (optional)**- List of strings with fields that you want to filter on
 
-**page_size (int)** - Size of the page
+**page_from: int (optional)** - Starting page number
+
+**page_size: int (optional)** - Size of the page
 
 ```
-annoq().GetSNPsByRsIDs(rsIDs=['rs189126619', 'rs115366554'], fields=["rs_dbSNP151", "ref"], filter=["rs_dbSNP151"], page_from=0, page_size=2)
+annoq().get_SNPs_by_RsIDs(rsIDs=['rs189126619', 'rs115366554'], fields=["rs_dbSNP151", "ref"], query_type_option='SNPS', filter=["rs_dbSNP151"], page_from=0, page_size=2)
 ```
 
 ## Count SNP by Chromosome Query
-CountSNPsByChromosome(self, chr, start, end, filter)
+count_SNPs_by_chromosome(self, chr, start, end, filter)
 
 return int
 
 #### Parameters
 
-**chr (str)** -  Chromosome string
+**chr: str** -  Chromosome string
 
-**start (int)** - Start of chromosome
+**start: int** - Start of chromosome
 
-**end (int)** - End of chromosome
+**end: int** - End of chromosome
 
-**filter (list[str])** - List of strings with fields that you want to filter on
+**filter: list[str] (optional)** - List of strings with fields that you want to filter on
 
 ```
-annoq().CountSNPsByChromosome(chr="2", start=1, end=10000000, filter=["chr", "ANNOVAR_ensembl_Closest_gene(intergenic_only)"])
+annoq().count_SNPs_by_chromosome(chr="2", start=1, end=10000000, filter=["chr", "ANNOVAR_ensembl_Closest_gene(intergenic_only)"])
 ```
 
 ## Count SNP by Gene Product Query
-CountSNPsByGeneProduct(self, gene, filter)
+count_SNPs_by_gene_product(self, gene, filter)
 
 return int
 
 #### Parameters
 
-**gene (str)** -  Gene product string
+**gene: str** -  Gene product string
 
-**filter (list[str])** - List of strings with fields that you want to filter on
+**filter: list[str]  (optional)** - List of strings with fields that you want to filter on
 
 ```
-annoq().CountSNPsByGeneProduct(gene="Q9BVC4", filter=["chr", "pos"])
+annoq().count_SNPs_by_gene_product(gene="Q9BVC4", filter=["chr", "pos"])
 ```
 
 ## Count SNP by ID Query
-CountSNPsByIDs(self, ids, filter)
+count_SNPs_by_IDs(self, ids, filter)
 
 return int
 
 #### Parameters
 
-**ids (list[str])** -  List of IDs
+**ids: list[str]** -  List of IDs
 
-**filter (list[str])** - List of strings with fields that you want to filter on
+**filter: list[str]  (optional)** - List of strings with fields that you want to filter on
 
 ```
-annoq().CountSNPsByIDs(ids=["2:10632C>A", "2:10632C>A"], filter=["chr"])
+annoq().count_SNPs_by_IDs(ids=["2:10632C>A", "2:10632C>A"], filter=["chr"])
 ```
 
 ## Count SNP by RsID Query
-CountSNPsByRsID(self, rsID, filter)
+count_SNPs_by_RsID(self, rsID, filter)
 
 return int
 
 #### Parameters
 
-**rsID (str)** -  rsID string
+**rsID: str** -  rsID string
 
-**filter (list[str])** - List of strings with fields that you want to filter on
+**filter: list[str]  (optional)** - List of strings with fields that you want to filter on
 
 ```
-annoq().CountSNPsByRsID(rsID='rs189126619', filter=["rs_dbSNP151"])
+annoq().count_SNPs_by_RsID(rsID='rs189126619', filter=["rs_dbSNP151"])
 ```
 
 ## Count SNP by RsIDs Query
-CountSNPsByRsIDs(self, rsIDs, filter)
+count_SNPs_by_RsIDs(self, rsIDs, filter)
 
 return int
 
 #### Parameters
 
-**rsIDs (list[str])** -  list of rsIDs
+**rsIDs: list[str]** -  list of rsIDs
 
-**filter (list[str])** - List of strings with fields that you want to filter on
+**filter: list[str]  (optional)** - List of strings with fields that you want to filter on
 
 ```
-annoq().CountSNPsByRsIDs(rsIDs=['rs189126619', 'rs115366554'], filter=["rs_dbSNP151"])
+annoq().count_SNPs_by_RsIDs(rsIDs=['rs189126619', 'rs115366554'], filter=["rs_dbSNP151"])
 ```
