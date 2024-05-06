@@ -42,14 +42,14 @@ class annoq:
             print('Unexpected error:', e)
     
 
-    def get_SNPs_by_gene_product(self, gene, fields, filter=None, page_from=None, page_size=None):
+    def get_SNPs_by_gene_product(self, gene, fields, query_type_option='SNPS', filter=None, page_from=None, page_size=None):
         try:
             fields_str = ''
             for elt in fields:
                 fields_str += elt + '\n'
             base = f"""
                     query MyQuery {{
-                        get_SNPs_by_gene_product(gene: {json.dumps(gene)}, query_type_option: SNPS
+                        get_SNPs_by_gene_product(gene: {json.dumps(gene)}, query_type_option: {query_type_option}
                     """
             if filter != None:
                 base += f"""
@@ -75,14 +75,14 @@ class annoq:
             print('Unexpected error:', e)
     
 
-    def get_SNPs_by_IDs(self, ids, fields, filter=None, page_from=None, page_size=None):
+    def get_SNPs_by_IDs(self, ids, fields, query_type_option='SNPS', filter=None, page_from=None, page_size=None):
         try:
             fields_str = ''
             for elt in fields:
                 fields_str += elt + '\n'
             base = f"""
                     query MyQuery {{
-                        get_SNPs_by_IDs(ids: {json.dumps(ids)}, query_type_option: SNPS
+                        get_SNPs_by_IDs(ids: {json.dumps(ids)}, query_type_option: {query_type_option}
                     """
             if filter != None:
                 base += f"""
@@ -109,64 +109,72 @@ class annoq:
             print('Unexpected error:', e)
     
 
-    def GetSNPsByRsID(self, rsID, fields, filter=None, page_from=None, page_size=None):
-        fields_str = ''
-        for elt in fields:
-            fields_str += elt + '\n'
-        base = f"""
-                query MyQuery {{
-                    GetSNPsByRsID(rsID: {json.dumps(rsID)}
-                """
-        if filter != None:
-            base += f"""
-                    , filter_args: {{exists: {json.dumps(filter)}}}
+    def get_SNPs_by_RsID(self, rsID, fields, filter=None, query_type_option='SNPS', page_from=None, page_size=None):
+        try:
+            fields_str = ''
+            for elt in fields:
+                fields_str += elt + '\n'
+            base = f"""
+                    query MyQuery {{
+                        get_SNPs_by_RsID(rsID: {json.dumps(rsID)}, query_type_option: {query_type_option}
                     """
-        if page_from != None and page_size != None:
-            base += f"""
-                    , page_args: {{from_: {page_from}, size: {page_size}}}
-                    """
-            
-        query = base + f"""
-            ) {{
-                    {fields_str}
+            if filter != None:
+                base += f"""
+                        , filter_args: {{exists: {json.dumps(filter)}}}
+                        """
+            if page_from != None and page_size != None:
+                base += f"""
+                        , page_args: {{from_: {page_from}, size: {page_size}}}
+                        """
+                
+            query = base + f"""
+                ) {{ snps {{
+                            {fields_str}
+                        }}
+                    }}
                 }}
-            }}
-            """
+                """
 
-        response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
+            response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
 
-        data = json.loads(response.text)
-        return data['data']['GetSNPsByRsID']
+            data = json.loads(response.text)
+            return data['data']['get_SNPs_by_RsID']['snps']
+        except Exception as e:
+            print('Unexpected error:', e)
     
 
-    def GetSNPsByRsIDs(self, rsIDs, fields, filter=None, page_from=None, page_size=None):
-        fields_str = ''
-        for elt in fields:
-            fields_str += elt + '\n'
-        base = f"""
-                query MyQuery {{
-                    GetSNPsByRsIDs(rsIDs: {json.dumps(rsIDs)}
-                """
-        if filter != None:
-            base += f"""
-                    , filter_args: {{exists: {json.dumps(filter)}}}
+    def get_SNPs_by_RsIDs(self, rsIDs, fields, filter=None, query_type_option='SNPS', page_from=None, page_size=None):
+        try:
+            fields_str = ''
+            for elt in fields:
+                fields_str += elt + '\n'
+            base = f"""
+                    query MyQuery {{
+                        get_SNPs_by_RsIDs(rsIDs: {json.dumps(rsIDs)}, query_type_option: {query_type_option}
                     """
-        if page_from != None and page_size != None:
-            base += f"""
-                    , page_args: {{from_: {page_from}, size: {page_size}}}
-                    """
-            
-        query = base + f"""
-            ) {{
-                    {fields_str}
+            if filter != None:
+                base += f"""
+                        , filter_args: {{exists: {json.dumps(filter)}}}
+                        """
+            if page_from != None and page_size != None:
+                base += f"""
+                        , page_args: {{from_: {page_from}, size: {page_size}}}
+                        """
+                
+            query = base + f"""
+                ) {{ snps {{
+                            {fields_str}
+                        }}
+                    }}
                 }}
-            }}
-            """
+                """
 
-        response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
+            response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
 
-        data = json.loads(response.text)
-        return data['data']['GetSNPsByRsIDs']
+            data = json.loads(response.text)
+            return data['data']['get_SNPs_by_RsIDs']['snps']
+        except Exception as e:
+            print('Unexpected error:', e)
     
 
     def CountSNPsByChromosome(self, chr, start, end, filter=None):

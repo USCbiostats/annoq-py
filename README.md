@@ -57,15 +57,18 @@ Returns list of json
 
 #### Parameters 
 
-**gene (str)** -  Gene product string
+**gene: str** -  Gene product string
 
-**fields (list[str])** - List of strings with the fields that you
+**fields: list[str]** - List of strings with the fields that you
 
-**filter (list[str])** - List of strings with fields that you want to filter on
+**query_type_option: str (optional)** - The value for this is SNPS if scrolling is not needed and SCROLL if scrolling is needed. By default it is SNPS. 
 
-**page_from (int)** - Starting page number
 
-**page_size (int)** - Size of the page
+**filter: list[str] (optional)** - List of strings with fields that you want to filter on
+
+**page_from: int (optional)** - Starting page number
+
+**page_size: int (optional)** - Size of the page
 
 ```
 annoq().GetSNPsByGeneProduct(gene="Q9BVC4", fields=["chr", "id"], filter=["chr", "pos"], page_from=0, page_size=10)
