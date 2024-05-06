@@ -30,21 +30,23 @@ Returns list of json
 
 #### Parameters
 
-**chr (str)** -  Chromosome string
+**chr: str** -  Chromosome string
 
-**start (int)** - Start of chromosome
+**start: int** - Start of chromosome
 
-**end (int)** - End of chromosome
+**end: int** - End of chromosome
 
-**fields (list[str])** - List of strings with the fields that you
+**fields: list[str]** - List of strings with the fields that you
 
-**filter (list[str])** - List of strings with fields that you want to filter on
+**query_type_option: str (optional)** - The value for this is SNPS if scrolling is not needed and SCROLL if scrolling is needed. By default it is SNPS. 
 
-**page_from (int)** - Starting page number
+**filter: list[str] (optional)** - List of strings with fields that you want to filter on
 
-**page_size (int)** - Size of the page
+**page_from: int (optional)** - Starting page number
+
+**page_size: int (optional)** - Size of the page
 ```
-annoq().GetSNPsByChromosome(chr="2", start=1, end=10000000, fields=['chr', 'ref', 'pos', 'rs_dbSNP151', 'ANNOVAR_ensembl_Effect', 'ANNOVAR_refseq_Effect'], filter=['chr'], page_from=2, page_size=4)
+annoq().get_SNPs_by_chromosome(chr="2", start=1, end=10000000, fields=['chr', 'ref', 'pos', 'rs_dbSNP151', 'ANNOVAR_ensembl_Effect', 'ANNOVAR_refseq_Effect'], query_type_option='SCROLL', filter=['chr'], page_from=2, page_size=4)
 ```
 
 

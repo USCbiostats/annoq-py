@@ -8,94 +8,105 @@ class annoq:
         self.GRAPHQL_ENDPOINT = 'graphql'
 
 
-    def GetSNPsByChromosome(self, chr, start, end, fields, filter=None, page_from=None, page_size=None):
-        fields_str = ''
-        for elt in fields:
-            fields_str += elt + '\n'
-        base = f"""
-                query MyQuery {{
-                    GetSNPsByChromosome(chr: {json.dumps(chr)}, end: {end}, start: {start}
-                """
-        if filter != None:
-            base += f"""
-                    , filter_args: {{exists: {json.dumps(filter)}}}
+    def get_SNPs_by_chromosome(self, chr, start, end, fields, query_type_option='SNPS', filter=None, page_from=None, page_size=None):
+        try:
+            fields_str = ''
+            for elt in fields:
+                fields_str += elt + '\n'
+            base = f"""
+                    query MyQuery {{
+                        get_SNPs_by_chromosome(chr: {json.dumps(chr)}, end: {end}, start: {start}, query_type_option: {query_type_option}
                     """
-        if page_from != None and page_size != None:
-            base += f"""
-                    , page_args: {{from_: {page_from}, size: {page_size}}}
-                    """
-            
-        query = base + f"""
-            ) {{
-                    {fields_str}
+            if filter != None:
+                base += f"""
+                        , filter_args: {{exists: {json.dumps(filter)}}}
+                        """
+            if page_from != None and page_size != None:
+                base += f"""
+                        , page_args: {{from_: {page_from}, size: {page_size}}}
+                        """
+                
+            query = base + f"""
+                ) {{ snps {{
+                        {fields_str}
+                        }}
+                    }}
                 }}
-            }}
-            """
+                """
 
-        response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
+            response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
 
-        data = json.loads(response.text)
-        return data['data']['GetSNPsByChromosome']
+            data = json.loads(response.text)
+            return data['data']['get_SNPs_by_chromosome']['snps']
+        except Exception as e:
+            print('Unexpected error:', e)
     
 
-    def GetSNPsByGeneProduct(self, gene, fields, filter=None, page_from=None, page_size=None):
-        fields_str = ''
-        for elt in fields:
-            fields_str += elt + '\n'
-        base = f"""
-                query MyQuery {{
-                    GetSNPsByGeneProduct(gene: {json.dumps(gene)}
-                """
-        if filter != None:
-            base += f"""
-                    , filter_args: {{exists: {json.dumps(filter)}}}
+    def get_SNPs_by_gene_product(self, gene, fields, filter=None, page_from=None, page_size=None):
+        try:
+            fields_str = ''
+            for elt in fields:
+                fields_str += elt + '\n'
+            base = f"""
+                    query MyQuery {{
+                        get_SNPs_by_gene_product(gene: {json.dumps(gene)}, query_type_option: SNPS
                     """
-        if page_from != None and page_size != None:
-            base += f"""
-                    , page_args: {{from_: {page_from}, size: {page_size}}}
-                    """
-            
-        query = base + f"""
-            ) {{
-                    {fields_str}
+            if filter != None:
+                base += f"""
+                        , filter_args: {{exists: {json.dumps(filter)}}}
+                        """
+            if page_from != None and page_size != None:
+                base += f"""
+                        , page_args: {{from_: {page_from}, size: {page_size}}}
+                        """
+                
+            query = base + f"""
+                ) {{ snps {{
+                            {fields_str}
+                        }}
+                    }}
                 }}
-            }}
-            """
-
-        response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
-
-        data = json.loads(response.text)
-        return data['data']['GetSNPsByGeneProduct']
-    
-    
-    def GetSNPsByIDs(self, ids, fields, filter=None, page_from=None, page_size=None):
-        fields_str = ''
-        for elt in fields:
-            fields_str += elt + '\n'
-        base = f"""
-                query MyQuery {{
-                    GetSNPsByIDs(ids: {json.dumps(ids)}
                 """
-        if filter != None:
-            base += f"""
-                    , filter_args: {{exists: {json.dumps(filter)}}}
+            response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
+
+            data = json.loads(response.text)
+            return data['data']['get_SNPs_by_gene_product']['snps']
+        except Exception as e:
+            print('Unexpected error:', e)
+    
+
+    def get_SNPs_by_IDs(self, ids, fields, filter=None, page_from=None, page_size=None):
+        try:
+            fields_str = ''
+            for elt in fields:
+                fields_str += elt + '\n'
+            base = f"""
+                    query MyQuery {{
+                        get_SNPs_by_IDs(ids: {json.dumps(ids)}, query_type_option: SNPS
                     """
-        if page_from != None and page_size != None:
-            base += f"""
-                    , page_args: {{from_: {page_from}, size: {page_size}}}
-                    """
-            
-        query = base + f"""
-            ) {{
-                    {fields_str}
+            if filter != None:
+                base += f"""
+                        , filter_args: {{exists: {json.dumps(filter)}}}
+                        """
+            if page_from != None and page_size != None:
+                base += f"""
+                        , page_args: {{from_: {page_from}, size: {page_size}}}
+                        """
+                
+            query = base + f"""
+                ) {{ snps {{
+                            {fields_str}
+                        }}
+                    }}
                 }}
-            }}
-            """
+                """
 
-        response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
+            response = requests.post(f"{self.BASE_URL}{self.GRAPHQL_ENDPOINT}", json={'query': query})
 
-        data = json.loads(response.text)
-        return data['data']['GetSNPsByIDs']
+            data = json.loads(response.text)
+            return data['data']['get_SNPs_by_IDs']['snps']
+        except Exception as e:
+            print('Unexpected error:', e)
     
 
     def GetSNPsByRsID(self, rsID, fields, filter=None, page_from=None, page_size=None):
