@@ -8,8 +8,13 @@ class annoq:
         self.GRAPHQL_ENDPOINT = 'graphql'
 
 
-    def get_SNPs_by_chromosome(self, chr, start, end, fields, query_type_option='SNPS', filter=None, page_from=None, page_size=None):
+    def get_SNPs_by_chromosome(self, chr, start, end, fields, filter=None, page_from=None, page_size=None):
         try:
+            query_type_option = 'SNPS'
+            
+            if page_from > 10000:
+                query_type_option = 'SCROLL'
+
             fields_str = ''
             for elt in fields:
                 fields_str += elt + '\n'
@@ -42,8 +47,13 @@ class annoq:
             print('Unexpected error:', e)
     
 
-    def get_SNPs_by_gene_product(self, gene, fields, query_type_option='SNPS', filter=None, page_from=None, page_size=None):
+    def get_SNPs_by_gene_product(self, gene, fields, filter=None, page_from=None, page_size=None):
         try:
+            query_type_option = 'SNPS'
+            
+            if page_from > 10000:
+                query_type_option = 'SCROLL'
+
             fields_str = ''
             for elt in fields:
                 fields_str += elt + '\n'
@@ -75,8 +85,13 @@ class annoq:
             print('Unexpected error:', e)
     
 
-    def get_SNPs_by_IDs(self, ids, fields, query_type_option='SNPS', filter=None, page_from=None, page_size=None):
+    def get_SNPs_by_IDs(self, ids, fields, filter=None, page_from=None, page_size=None):
         try:
+            query_type_option = 'SNPS'
+            
+            if page_from > 10000:
+                query_type_option = 'SCROLL'
+
             fields_str = ''
             for elt in fields:
                 fields_str += elt + '\n'
@@ -109,8 +124,13 @@ class annoq:
             print('Unexpected error:', e)
     
 
-    def get_SNPs_by_RsID(self, rsID, fields, filter=None, query_type_option='SNPS', page_from=None, page_size=None):
+    def get_SNPs_by_RsID(self, rsID, fields, filter=None, page_from=None, page_size=None):
         try:
+            query_type_option = 'SNPS'
+            
+            if page_from > 10000:
+                query_type_option = 'SCROLL'
+
             fields_str = ''
             for elt in fields:
                 fields_str += elt + '\n'
@@ -143,8 +163,13 @@ class annoq:
             print('Unexpected error:', e)
     
 
-    def get_SNPs_by_RsIDs(self, rsIDs, fields, filter=None, query_type_option='SNPS', page_from=None, page_size=None):
+    def get_SNPs_by_RsIDs(self, rsIDs, fields, filter=None, page_from=None, page_size=None):
         try:
+            query_type_option = 'SNPS'
+            
+            if page_from > 10000:
+                query_type_option = 'SCROLL'
+
             fields_str = ''
             for elt in fields:
                 fields_str += elt + '\n'

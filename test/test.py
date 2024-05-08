@@ -3,12 +3,20 @@ from src.annoq import annoq
 def test_get_SNPs_by_chromosome():
     response = annoq().get_SNPs_by_chromosome(chr="2", start=1, end=10000000, 
                                 fields=['chr', 'ref', 'pos', 'rs_dbSNP151', 'ANNOVAR_ensembl_Effect', 'ANNOVAR_refseq_Effect'], 
-                                query_type_option='SCROLL', filter=['chr'], page_from=2, page_size=4)
+                                filter=['chr'], page_from=2, page_size=4)
     for elt in response:
         assert elt['chr'] == '2'
         assert elt['pos'] > 1
         assert elt['pos'] < 10000000
         assert elt['ANNOVAR_ensembl_Effect'] == 'intergenic' or 'upstream'
+
+
+def test_scroll_SNPs_by_chromosome():
+    response = annoq().get_SNPs_by_chromosome(chr="2", start=1, end=10000000, fields=['chr', 'ref'], filter=['chr'], page_from=16000, page_size=10)
+    for elt in response:
+        assert elt['chr'] == '2'
+
+    assert len(response) == 10
 
 
 def test_get_SNPs_by_gene_product():
@@ -19,14 +27,14 @@ def test_get_SNPs_by_gene_product():
 
 
 def test_get_SNPs_by_IDs():
-    response = annoq().get_SNPs_by_IDs(ids=["2:10632C>A", "16:2255492G>A"], fields=["id", "chr"], query_type_option='SCROLL', filter=["chr"], page_from=0, page_size=5)
+    response = annoq().get_SNPs_by_IDs(ids=["2:10632C>A", "16:2255492G>A"], fields=["id", "chr"], filter=["chr"], page_from=0, page_size=5)
 
     for elt in response:
         assert elt['id'] == "2:10632C>A" or elt['id'] == "16:2255492G>A"
 
 
 def test_get_SNPs_by_RsID():
-    response = annoq().get_SNPs_by_RsID(rsID='rs189126619', fields=["rs_dbSNP151", "ref"], query_type_option='SNPS', filter=["rs_dbSNP151"], page_from=0, page_size=2)
+    response = annoq().get_SNPs_by_RsID(rsID='rs189126619', fields=["rs_dbSNP151", "ref"], filter=["rs_dbSNP151"], page_from=0, page_size=2)
 
     for elt in response:
         assert elt['rs_dbSNP151'] == 'rs189126619'

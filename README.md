@@ -28,6 +28,8 @@ GetSNPsByChromosome(self, chr, start, end, fields, filter=None, page_from=None, 
 
 Returns list of json
 
+Scrolling is done if page is more than 10k
+
 #### Parameters
 
 **chr: str** -  Chromosome string
@@ -37,8 +39,6 @@ Returns list of json
 **end: int** - End of chromosome
 
 **fields: list[str]** - List of strings with the fields that you
-
-**query_type_option: str (optional)** - The value for this is SNPS if scrolling is not needed and SCROLL if scrolling is needed. By default it is SNPS. 
 
 **filter: list[str] (optional)** - List of strings with fields that you want to filter on
 
@@ -55,13 +55,13 @@ GetSNPsByGeneProduct(self, gene, fields, filter=None, page_from=None, page_size=
 
 Returns list of json
 
+Scrolling is done if page is more than 10k
+
 #### Parameters 
 
 **gene: str** -  Gene product string
 
 **fields: list[str]** - List of strings with the fields that you
-
-**query_type_option: str (optional)** - The value for this is SNPS if scrolling is not needed and SCROLL if scrolling is needed. By default it is SNPS. 
 
 
 **filter: list[str] (optional)** - List of strings with fields that you want to filter on
@@ -71,7 +71,7 @@ Returns list of json
 **page_size: int (optional)** - Size of the page
 
 ```
-annoq().get_SNPs_by_gene_product(gene="Q9BVC4", fields=["chr", "id"], query_type_option='SCROLL', filter=["chr", "pos"], page_from=0, page_size=10)
+annoq().get_SNPs_by_gene_product(gene="Q9BVC4", fields=["chr", "id"], filter=["chr", "pos"], page_from=0, page_size=10)
 ```
 
 ## Get SNP by ID Query
@@ -79,13 +79,13 @@ GetSNPsByIDs(self, ids, fields, filter=None, page_from=None, page_size=None)
 
 Returns list of json
 
+Scrolling is done if page is more than 10k
+
 #### Parameters 
 
 **ids: list[str]** -  List of IDs
 
 **fields: list[str]** - List of strings with the fields that you
-
-**query_type_option: str (optional)** - The value for this is SNPS if scrolling is not needed and SCROLL if scrolling is needed. By default it is SNPS. 
 
 **filter: list[str] (optional)** - List of strings with fields that you want to filter on
 
@@ -102,13 +102,13 @@ GetSNPsByRsID(self, rsID, fields, filter=None, page_from=None, page_size=None)
 
 Returns list of json
 
+Scrolling is done if page is more than 10k
+
 #### Parameters 
 
 **rsID: str** -  rsID string
 
 **fields: list[str]** - List of strings with the fields that you
-
-**query_type_option: str (optional)** - The value for this is SNPS if scrolling is not needed and SCROLL if scrolling is needed. By default it is SNPS. 
 
 **filter: list[str] (optional)** - List of strings with fields that you want to filter on
 
@@ -125,13 +125,13 @@ GetSNPsByRsIDs(self, rsIDs, fields, filter=None, page_from=None, page_size=None)
 
 Returns list of json
 
+Scrolling is done if page is more than 10k
+
 #### Parameters 
 
 **rsIDs: list[str]** -  list of rsIDs
 
 **fields: list[str]** - List of strings with the fields that you
-
-**query_type_option: str (optional)** - The value for this is SNPS if scrolling is not needed and SCROLL if scrolling is needed. By default it is SNPS. 
 
 **filter: list[str] (optional)**- List of strings with fields that you want to filter on
 
