@@ -11,6 +11,14 @@ def test_get_SNPs_by_chromosome():
         assert elt['ANNOVAR_ensembl_Effect'] == 'intergenic' or 'upstream'
 
 
+def test_scroll_SNPs_by_chromosome():
+    response = annoq().get_SNPs_by_chromosome(chr="2", start=1, end=10000000, fields=['chr', 'ref'], filter=['chr'], page_from=16000, page_size=10)
+    for elt in response:
+        assert elt['chr'] == '2'
+
+    assert len(response) == 10
+
+
 def test_get_SNPs_by_gene_product():
     response = annoq().get_SNPs_by_gene_product(gene="Q9BVC4", fields=["chr", "id"], filter=["chr", "pos"], page_from=0, page_size=10)
     
