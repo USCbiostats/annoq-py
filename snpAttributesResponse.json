@@ -1,0 +1,74 @@
+{
+  "results": [
+    {
+      "api_label": "chr",
+      "display_label": "chr",
+      "definition": "Chromosome number of the variant.",
+      "data_type": "text",
+      "version": "HRC.r1-1"
+    },
+    {
+      "api_label": "pos",
+      "display_label": "pos",
+      "definition": "Position of the variant.",
+      "data_type": "long",
+      "version": "HRC.r1-1"
+    },
+    {
+      "api_label": "ref",
+      "display_label": "ref",
+      "definition": "The reference base of the variant.",
+      "data_type": "text",
+      "version": "HRC.r1-1"
+    },
+    {
+      "api_label": "alt",
+      "display_label": "alt",
+      "definition": "The alternative allele of the variant.",
+      "data_type": "text",
+      "version": "HRC.r1-1"
+    },
+    {
+      "api_label": "rs_dbSNP151",
+      "display_label": "rs ID",
+      "definition": "dbSNP ID if available. The current release supports rs IDs from dbSNP build 151.",
+      "data_type": "text",
+      "version": "HRC.r1-1"
+    },
+    {
+      "api_label": "enhancer_linked_GO_biological_process_complete_list_id",
+      "display_label": "PEREGRINE enhancer linked GO biological process complete",
+      "definition": "When the variant is located in an enhancer region, the complete GO biological process annotations of its target genes inferred from the enhancer-gene links in the PEREGRINE project are populated here.",
+      "data_type": "text",
+      "version": "GO database released 2025-03-16, DOI: 10.5281/zenodo.15066566"
+    },
+    {
+      "api_label": "enhancer_linked_GO_cellular_component_complete_list_id",
+      "display_label": "PEREGRINE enhancer linked GO cellular component complete",
+      "definition": "When the variant is located in an enhancer region, the complete GO cellular component annotations of its target genes inferred from the enhancer-gene links in the PEREGRINE project are populated here.",
+      "data_type": "text",
+      "version": "GO database released 2025-03-16, DOI: 10.5281/zenodo.15066566"
+    },
+    {
+      "api_label": "enhancer_linked_GO_molecular_function_complete_list_id",
+      "display_label": "PEREGRINE enhancer linked GO molecular function complete",
+      "definition": "When the variant is located in an enhancer region, the complete GO molecular function annotations of its target genes inferred from the enhancer-gene links in the PEREGRINE project are populated here.",
+      "data_type": "text",
+      "version": "GO database released 2025-03-16, DOI: 10.5281/zenodo.15066566"
+    },
+    {
+      "api_label": "enhancer_linked_PANTHER_GO_SLIM_biological_process_list_id",
+      "display_label": "PEREGRINE enhancer linked PANTHER GO-Slim biological process",
+      "definition": "When the variant is located in an enhancer region, the PANTHER GO-Slim Biological Process annotations of its target genes inferred from the enhancer-gene links in the PEREGRINE project are populated here.",
+      "data_type": "text",
+      "version": "GO release 2024-01-17, released 2024-06-20"
+    },
+    {
+      "api_label": "enhancer_linked_PANTHER_GO_SLIM_cellular_component_list_id",
+      "display_label": "PEREGRINE enhancer linked PANTHER GO-Slim cellular component",
+      "definition": "When the variant is located in an enhancer region, the PANTHER GO-Slim Cellular Component annotations of its target genes inferred from the enhancer-gene links in the PEREGRINE project are populated here.",
+      "data_type": "text",
+      "version": "GO release 2024-01-17, released 2024-06-20"
+    }
+  ]
+}
