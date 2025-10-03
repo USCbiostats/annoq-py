@@ -62,6 +62,9 @@ def get_snp_attributes() -> List[Dict[str, Any]]:
     response = requests.post(url)
     response.raise_for_status()
 
+    if 'results' not in response.json():
+        raise ValueError(f"Unexpected response from server: {response.json()}")
+    
     return response.json()["results"]
 
 
@@ -70,7 +73,7 @@ def get_snps_by_chr(
     start_position: Optional[int] = None,
     end_position: Optional[int] = None,
     fields: Union[str, List[str], None] = None,
-    filter_fields: Optional[str] = None,
+    filter_fields: Optional[list[str]] = None,
 ) -> List[Dict[str, Any]]:
     """
     Search for SNPs by chromosome id and position range.
@@ -99,12 +102,18 @@ def get_snps_by_chr(
         params["fields"] = processed_fields
 
     if filter_fields is not None:
-        params["filter_fields"] = filter_fields
+        params["filter_fields"] = ",".join(filter_fields)
 
     # Note: pagination parameters are ignored as they don't function
+    # But they are still required by the API (dummy values used)
+    params["pagination_from"] = "0"
+    params["pagination_size"] = "100"
 
     response = requests.post(url, params=params)
     response.raise_for_status()
+
+    if 'details' not in response.json():
+        raise ValueError(f"Unexpected response from server: {response.json()}")
 
     return response.json()["details"]
 
@@ -112,7 +121,7 @@ def get_snps_by_chr(
 def get_snps_by_rsid_list(
     rsid_list: Optional[Union[str, List[str]]] = None,
     fields: Union[str, List[str], None] = None,
-    filter_fields: Optional[str] = None,
+    filter_fields: Optional[list[str]] = None,
 ) -> List[Dict[str, Any]]:
     """
     Search for specified list of RSIDs.
@@ -140,12 +149,18 @@ def get_snps_by_rsid_list(
         params["fields"] = processed_fields
 
     if filter_fields is not None:
-        params["filter_fields"] = filter_fields
+        params["filter_fields"] = ",".join(filter_fields)
 
     # Note: pagination parameters are ignored as they don't function
+    # But they are still required by the API (dummy values used)
+    params["pagination_from"] = "0"
+    params["pagination_size"] = "100"
 
     response = requests.post(url, params=params)
     response.raise_for_status()
+
+    if 'details' not in response.json():
+        raise ValueError(f"Unexpected response from server: {response.json()}")
 
     return response.json()["details"]
 
@@ -153,7 +168,7 @@ def get_snps_by_rsid_list(
 def get_snps_by_gene_product(
     gene: Optional[str] = None,
     fields: Union[str, List[str], None] = None,
-    filter_fields: Optional[str] = None,
+    filter_fields: Optional[list[str]] = None,
 ) -> List[Dict[str, Any]]:
     """
     Search for specified gene product; this can be a gene id, gene symbol or UniProt id.
@@ -178,12 +193,18 @@ def get_snps_by_gene_product(
         params["fields"] = processed_fields
 
     if filter_fields is not None:
-        params["filter_fields"] = filter_fields
+        params["filter_fields"] = ",".join(filter_fields)
 
     # Note: pagination parameters are ignored as they don't function
+    # But they are still required by the API (dummy values used)
+    params["pagination_from"] = "0"
+    params["pagination_size"] = "100"
 
     response = requests.post(url, params=params)
     response.raise_for_status()
+
+    if 'details' not in response.json():
+        raise ValueError(f"Unexpected response from server: {response.json()}")
 
     return response.json()["details"]
 
@@ -192,7 +213,7 @@ def count_snps_by_chr(
     chromosome_identifier: str,
     start_position: Optional[int] = None,
     end_position: Optional[int] = None,
-    filter_fields: Optional[str] = None,
+    filter_fields: Optional[list[str]] = None,
 ) -> int:
     """
     Count SNPs based on specified chromosome, start position, end position and filter arguments.
@@ -216,17 +237,20 @@ def count_snps_by_chr(
         params["end_position"] = str(end_position)
 
     if filter_fields is not None:
-        params["filter_fields"] = filter_fields
+        params["filter_fields"] = ",".join(filter_fields)
 
     response = requests.post(url, params=params)
     response.raise_for_status()
+
+    if 'details' not in response.json():
+        raise ValueError(f"Unexpected response from server: {response.json()}")
 
     return response.json()["details"]
 
 
 def count_snps_by_rsid_list(
     rsid_list: Optional[Union[str, List[str]]] = None,
-    filter_fields: Optional[str] = None,
+    filter_fields: Optional[list[str]] = None,
 ) -> int:
     """
     Count the number of SNPs defined in the system that have matching RSIDs from the specified list.
@@ -249,16 +273,19 @@ def count_snps_by_rsid_list(
             params["rsid_list"] = rsid_list
 
     if filter_fields is not None:
-        params["filter_fields"] = filter_fields
+        params["filter_fields"] = ",".join(filter_fields)
 
     response = requests.post(url, params=params)
     response.raise_for_status()
+
+    if 'details' not in response.json():
+        raise ValueError(f"Unexpected response from server: {response.json()}")
 
     return response.json()["details"]
 
 
 def count_snps_by_gene_product(
-    gene: Optional[str] = None, filter_fields: Optional[str] = None
+    gene: Optional[str] = None, filter_fields: Optional[list[str]] = None
 ) -> int:
     """
     Count the number of SNPs defined in the system that have been associated for the specified gene product.
@@ -278,9 +305,12 @@ def count_snps_by_gene_product(
         params["gene"] = gene
 
     if filter_fields is not None:
-        params["filter_fields"] = filter_fields
+        params["filter_fields"] = ",".join(filter_fields)
 
     response = requests.post(url, params=params)
     response.raise_for_status()
+
+    if 'details' not in response.json():
+        raise ValueError(f"Unexpected response from server: {response.json()}")
 
     return response.json()["details"]
