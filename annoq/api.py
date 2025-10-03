@@ -50,19 +50,19 @@ def _process_fields_param(fields: Union[str, List[str], None]) -> Optional[str]:
         )
 
 
-def get_snp_attributes() -> Dict[str, Any]:
+def get_snp_attributes() -> List[Dict[str, Any]]:
     """
     Retrieve available list of SNP attributes.
 
     Returns:
-        A dictionary containing the available SNP attributes.
+        An array of dictionaries containing the available SNP attributes.
     """
     url = f"{BASE_URL}/fastapi/snpAttributes"
 
     response = requests.post(url)
     response.raise_for_status()
 
-    return response.json()
+    return response.json()["results"]
 
 
 def get_snps_by_chr(
@@ -71,7 +71,7 @@ def get_snps_by_chr(
     end_position: Optional[int] = None,
     fields: Union[str, List[str], None] = None,
     filter_fields: Optional[str] = None,
-) -> Dict[str, Any]:
+) -> List[Dict[str, Any]]:
     """
     Search for SNPs by chromosome id and position range.
 
@@ -83,7 +83,7 @@ def get_snps_by_chr(
         filter_fields: SNP attribute labels that should not be empty for the record to be retrieved
 
     Returns:
-        A dictionary containing the SNP information.
+        An array of dictionaries containing the SNP information.
     """
     url = f"{BASE_URL}/fastapi/snp/chr"
 
@@ -106,14 +106,14 @@ def get_snps_by_chr(
     response = requests.post(url, params=params)
     response.raise_for_status()
 
-    return response.json()
+    return response.json()["details"]
 
 
 def get_snps_by_rsid_list(
     rsid_list: Optional[Union[str, List[str]]] = None,
     fields: Union[str, List[str], None] = None,
     filter_fields: Optional[str] = None,
-) -> Dict[str, Any]:
+) -> List[Dict[str, Any]]:
     """
     Search for specified list of RSIDs.
 
@@ -123,7 +123,7 @@ def get_snps_by_rsid_list(
         filter_fields: SNP attribute labels that should not be empty for the record to be retrieved
 
     Returns:
-        A dictionary containing the SNP information.
+        An array of dictionaries containing the SNP information.
     """
     url = f"{BASE_URL}/fastapi/snp/rsidList"
 
@@ -147,14 +147,14 @@ def get_snps_by_rsid_list(
     response = requests.post(url, params=params)
     response.raise_for_status()
 
-    return response.json()
+    return response.json()["details"]
 
 
 def get_snps_by_gene_product(
     gene: Optional[str] = None,
     fields: Union[str, List[str], None] = None,
     filter_fields: Optional[str] = None,
-) -> Dict[str, Any]:
+) -> List[Dict[str, Any]]:
     """
     Search for specified gene product; this can be a gene id, gene symbol or UniProt id.
 
@@ -164,7 +164,7 @@ def get_snps_by_gene_product(
         filter_fields: SNP attribute labels that should not be empty for the record to be retrieved
 
     Returns:
-        A dictionary containing the SNP information.
+        An array of dictionaries containing the SNP information.
     """
     url = f"{BASE_URL}/fastapi/snp/gene_product"
 
@@ -185,7 +185,7 @@ def get_snps_by_gene_product(
     response = requests.post(url, params=params)
     response.raise_for_status()
 
-    return response.json()
+    return response.json()["details"]
 
 
 def count_snps_by_chr(
@@ -193,7 +193,7 @@ def count_snps_by_chr(
     start_position: Optional[int] = None,
     end_position: Optional[int] = None,
     filter_fields: Optional[str] = None,
-) -> Dict[str, Any]:
+) -> int:
     """
     Count SNPs based on specified chromosome, start position, end position and filter arguments.
 
@@ -204,7 +204,7 @@ def count_snps_by_chr(
         filter_fields: SNP attribute labels that should not be empty for the record to be retrieved
 
     Returns:
-        A dictionary containing the count information.
+        The count of SNPs matching the criteria.
     """
     url = f"{BASE_URL}/fastapi/count/chr"
 
@@ -221,13 +221,13 @@ def count_snps_by_chr(
     response = requests.post(url, params=params)
     response.raise_for_status()
 
-    return response.json()
+    return response.json()["details"]
 
 
 def count_snps_by_rsid_list(
     rsid_list: Optional[Union[str, List[str]]] = None,
     filter_fields: Optional[str] = None,
-) -> Dict[str, Any]:
+) -> int:
     """
     Count the number of SNPs defined in the system that have matching RSIDs from the specified list.
 
@@ -236,7 +236,7 @@ def count_snps_by_rsid_list(
         filter_fields: SNP attribute labels that should not be empty for the record to be retrieved
 
     Returns:
-        A dictionary containing the count information.
+        The count of SNPs matching the criteria.
     """
     url = f"{BASE_URL}/fastapi/count/rsidList"
 
@@ -254,12 +254,12 @@ def count_snps_by_rsid_list(
     response = requests.post(url, params=params)
     response.raise_for_status()
 
-    return response.json()
+    return response.json()["details"]
 
 
 def count_snps_by_gene_product(
     gene: Optional[str] = None, filter_fields: Optional[str] = None
-) -> Dict[str, Any]:
+) -> int:
     """
     Count the number of SNPs defined in the system that have been associated for the specified gene product.
 
@@ -268,7 +268,7 @@ def count_snps_by_gene_product(
         filter_fields: SNP attribute labels that should not be empty for the record to be retrieved
 
     Returns:
-        A dictionary containing the count information.
+        The count of SNPs matching the criteria.
     """
     url = f"{BASE_URL}/fastapi/count/gene_product"
 
@@ -283,4 +283,4 @@ def count_snps_by_gene_product(
     response = requests.post(url, params=params)
     response.raise_for_status()
 
-    return response.json()
+    return response.json()["details"]
