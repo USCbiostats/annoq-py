@@ -175,7 +175,7 @@ def get_snps_by_chr(
 
 
 def get_snps_by_rsid_list(
-    rsid_list: Optional[Union[str, List[str]]] = None,
+    rsid_list: Union[str, List[str]],
     fields: Union[str, List[str], None] = None,
     filter_fields: Optional[list[str]] = None,
     pagination_from: int = 0,
@@ -253,7 +253,7 @@ def get_snps_by_rsid_list(
 
 
 def get_snps_by_gene_product(
-    gene: Optional[str] = None,
+    gene: str,
     fields: Union[str, List[str], None] = None,
     filter_fields: Optional[list[str]] = None,
     pagination_from: int = 0,
@@ -367,7 +367,7 @@ def count_snps_by_chr(
 
 
 def count_snps_by_rsid_list(
-    rsid_list: Optional[Union[str, List[str]]] = None,
+    rsid_list: Union[str, List[str]],
     filter_fields: Optional[list[str]] = None,
 ) -> int:
     """
@@ -403,7 +403,7 @@ def count_snps_by_rsid_list(
 
 
 def count_snps_by_gene_product(
-    gene: Optional[str] = None, filter_fields: Optional[list[str]] = None
+    gene: str, filter_fields: Optional[list[str]] = None
 ) -> int:
     """
     Count the number of SNPs defined in the system that have been associated for the specified gene product.
