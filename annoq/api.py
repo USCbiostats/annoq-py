@@ -50,6 +50,30 @@ def _process_fields_param(fields: Union[str, List[str], None]) -> Optional[str]:
         )
 
 
+def _download_all_snps(url: str, params: Dict[str, str]) -> List[Dict[str, Any]]:
+    """
+    Helper function to download all SNPs using the download API endpoint.
+
+    Args:
+        url: The API endpoint URL for downloading SNPs.
+        params: The parameters to be sent with the request.
+
+    Returns:
+        An array of dictionaries containing the SNP information.
+    """
+    params["format"] = "ndjson"
+
+    response = requests.post(url, params=params, stream=True)
+    response.raise_for_status()
+    snp_list = []
+    for line in response.iter_lines():
+        if line:
+            snp_record = json.loads(line.decode("utf-8"))
+            snp_list.append(snp_record)
+
+    return snp_list
+
+
 def get_snp_attributes() -> List[Dict[str, Any]]:
     """
     Retrieve available list of SNP attributes.
@@ -57,14 +81,14 @@ def get_snp_attributes() -> List[Dict[str, Any]]:
     Returns:
         An array of dictionaries containing the available SNP attributes.
     """
-    url = f"{BASE_URL}/fastapi/snpAttributes"
+    url = f"{BASE_URL}/snpAttributes"
 
-    response = requests.post(url)
+    response = requests.get(url)
     response.raise_for_status()
 
-    if 'results' not in response.json():
+    if "results" not in response.json():
         raise ValueError(f"Unexpected response from server: {response.json()}")
-    
+
     return response.json()["results"]
 
 
@@ -74,21 +98,38 @@ def get_snps_by_chr(
     end_position: Optional[int] = None,
     fields: Union[str, List[str], None] = None,
     filter_fields: Optional[list[str]] = None,
+    pagination_from: int = 0,
+    pagination_size: int = 1000,
+    fetch_all: bool = False,
 ) -> List[Dict[str, Any]]:
     """
-    Search for SNPs by chromosome id and position range.
+    Search for SNPs by chromosome id and position range using pagination.
 
     Args:
         chromosome_identifier: Chromosome id to search (e.g., "1", "2", "X")
         start_position: Start position region of search (default: 1)
         end_position: End position region of search (default: 100000)
-        fields: Fields to return, can be JSON string, file path, or list of attributes
+        fields: Fields to return, can be JSON string, file path, or list of attributes. Number of fields is limited to 20.
         filter_fields: SNP attribute labels that should not be empty for the record to be retrieved
+        pagination_from: Pagination start index (default: 0)
+        pagination_size: Pagination page size (default: 1000)
+        fetch_all: If True, retrieves all matching SNPs by downloading all pages (default: False)
 
     Returns:
         An array of dictionaries containing the SNP information.
+
+    Notes:
+        - If fetch_all is True, pagination_from and pagination_size are ignored.
+        - The function will return all matching SNPs in a single list.
+        - It only supports up to 1,000,000 SNPs being fetched in total.
+
+        - If using pagination (fetch_all=False), you cannot fetch more than the first 10,000 SNPs over all pages.
+        - pagination_from + pagination_size must be <= 10,000.
+
+    Raises:
+        ValueError: If the response from the server is unexpected.
+        ValueError: If fetch_all is False and pagination_from + pagination_size > 10,000.
     """
-    url = f"{BASE_URL}/fastapi/snp/chr"
 
     params = {"chromosome_identifier": chromosome_identifier}
 
@@ -104,15 +145,30 @@ def get_snps_by_chr(
     if filter_fields is not None:
         params["filter_fields"] = ",".join(filter_fields)
 
-    # Note: pagination parameters are ignored as they don't function
-    # But they are still required by the API (dummy values used)
-    params["pagination_from"] = "0"
-    params["pagination_size"] = "100"
+    if fetch_all:
+        # Use the download api to fetch all results
+        url = f"{BASE_URL}/snp/chr/download"
+        return _download_all_snps(url, params)
 
-    response = requests.post(url, params=params)
+    if pagination_from < 0 or pagination_size <= 0:
+        raise ValueError(
+            "pagination_from must be >= 0 and pagination_size must be > 0."
+        )
+
+    if pagination_from + pagination_size > 10000:
+        raise ValueError(
+            "When fetch_all is False, pagination_from + pagination_size must be <= 10,000."
+        )
+
+    url = f"{BASE_URL}/snp/chr"
+
+    params["pagination_from"] = str(pagination_from)
+    params["pagination_size"] = str(pagination_size)
+
+    response = requests.get(url, params=params)
     response.raise_for_status()
 
-    if 'details' not in response.json():
+    if "details" not in response.json():
         raise ValueError(f"Unexpected response from server: {response.json()}")
 
     return response.json()["details"]
@@ -122,19 +178,37 @@ def get_snps_by_rsid_list(
     rsid_list: Optional[Union[str, List[str]]] = None,
     fields: Union[str, List[str], None] = None,
     filter_fields: Optional[list[str]] = None,
+    pagination_from: int = 0,
+    pagination_size: int = 1000,
+    fetch_all: bool = False,
 ) -> List[Dict[str, Any]]:
     """
     Search for specified list of RSIDs.
 
     Args:
         rsid_list: List of RSIDs to search, can be comma-separated string or list of strings
-        fields: Fields to return, can be JSON string, file path, or list of attributes
+        fields: Fields to return, can be JSON string, file path, or list of attributes. Number of fields is limited to 20.
         filter_fields: SNP attribute labels that should not be empty for the record to be retrieved
+        pagination_from: Pagination start index (default: 0)
+        pagination_size: Pagination page size (default: 1000)
+        fetch_all: If True, retrieves all matching SNPs by downloading all pages (default: False)
 
     Returns:
         An array of dictionaries containing the SNP information.
+
+    Notes:
+        - If fetch_all is True, pagination_from and pagination_size are ignored.
+        - The function will return all matching SNPs in a single list.
+        - It only supports up to 1,000,000 SNPs being fetched in total.
+
+        - If using pagination (fetch_all=False), you cannot fetch more than the first 10,000 SNPs over all pages.
+        - pagination_from + pagination_size must be <= 10,000.
+
+    Raises:
+        ValueError: If the response from the server is unexpected.
+        ValueError: If fetch_all is False and pagination_from + pagination_size > 10,000.
     """
-    url = f"{BASE_URL}/fastapi/snp/rsidList"
+    url = f"{BASE_URL}/snp/rsidList"
 
     params = {}
 
@@ -151,15 +225,28 @@ def get_snps_by_rsid_list(
     if filter_fields is not None:
         params["filter_fields"] = ",".join(filter_fields)
 
-    # Note: pagination parameters are ignored as they don't function
-    # But they are still required by the API (dummy values used)
-    params["pagination_from"] = "0"
-    params["pagination_size"] = "100"
+    if fetch_all:
+        # Use the download api to fetch all results
+        url = f"{BASE_URL}/snp/rsidList/download"
+        return _download_all_snps(url, params)
 
-    response = requests.post(url, params=params)
+    if pagination_from < 0 or pagination_size <= 0:
+        raise ValueError(
+            "pagination_from must be >= 0 and pagination_size must be > 0."
+        )
+
+    if pagination_from + pagination_size > 10000:
+        raise ValueError(
+            "When fetch_all is False, pagination_from + pagination_size must be <= 10,000."
+        )
+
+    params["pagination_from"] = str(pagination_from)
+    params["pagination_size"] = str(pagination_size)
+
+    response = requests.get(url, params=params)
     response.raise_for_status()
 
-    if 'details' not in response.json():
+    if "details" not in response.json():
         raise ValueError(f"Unexpected response from server: {response.json()}")
 
     return response.json()["details"]
@@ -169,19 +256,37 @@ def get_snps_by_gene_product(
     gene: Optional[str] = None,
     fields: Union[str, List[str], None] = None,
     filter_fields: Optional[list[str]] = None,
+    pagination_from: int = 0,
+    pagination_size: int = 1000,
+    fetch_all: bool = False,
 ) -> List[Dict[str, Any]]:
     """
     Search for specified gene product; this can be a gene id, gene symbol or UniProt id.
 
     Args:
         gene: Gene product to search
-        fields: Fields to return, can be JSON string, file path, or list of attributes
+        fields: Fields to return, can be JSON string, file path, or list of attributes. Number of fields is limited to 20.
         filter_fields: SNP attribute labels that should not be empty for the record to be retrieved
+        pagination_from: Pagination start index (default: 0)
+        pagination_size: Pagination page size (default: 1000)
+        fetch_all: If True, retrieves all matching SNPs by downloading all pages (default: False)
 
     Returns:
         An array of dictionaries containing the SNP information.
+
+    Notes:
+        - If fetch_all is True, pagination_from and pagination_size are ignored.
+        - The function will return all matching SNPs in a single list.
+        - It only supports up to 1,000,000 SNPs being fetched in total.
+
+        - If using pagination (fetch_all=False), you cannot fetch more than the first 10,000 SNPs over all pages.
+        - pagination_from + pagination_size must be <= 10,000.
+
+    Raises:
+        ValueError: If the response from the server is unexpected.
+        ValueError: If fetch_all is False and pagination_from + pagination_size > 10,000.
     """
-    url = f"{BASE_URL}/fastapi/snp/gene_product"
+    url = f"{BASE_URL}/snp/gene_product"
 
     params = {}
 
@@ -195,15 +300,28 @@ def get_snps_by_gene_product(
     if filter_fields is not None:
         params["filter_fields"] = ",".join(filter_fields)
 
-    # Note: pagination parameters are ignored as they don't function
-    # But they are still required by the API (dummy values used)
-    params["pagination_from"] = "0"
-    params["pagination_size"] = "100"
+    if fetch_all:
+        # Use the download api to fetch all results
+        url = f"{BASE_URL}/snp/gene_product/download"
+        return _download_all_snps(url, params)
 
-    response = requests.post(url, params=params)
+    if pagination_from < 0 or pagination_size <= 0:
+        raise ValueError(
+            "pagination_from must be >= 0 and pagination_size must be > 0."
+        )
+
+    if pagination_from + pagination_size > 10000:
+        raise ValueError(
+            "When fetch_all is False, pagination_from + pagination_size must be <= 10,000."
+        )
+
+    params["pagination_from"] = str(pagination_from)
+    params["pagination_size"] = str(pagination_size)
+
+    response = requests.get(url, params=params)
     response.raise_for_status()
 
-    if 'details' not in response.json():
+    if "details" not in response.json():
         raise ValueError(f"Unexpected response from server: {response.json()}")
 
     return response.json()["details"]
@@ -227,7 +345,7 @@ def count_snps_by_chr(
     Returns:
         The count of SNPs matching the criteria.
     """
-    url = f"{BASE_URL}/fastapi/count/chr"
+    url = f"{BASE_URL}/count/chr"
 
     params = {"chromosome_identifier": chromosome_identifier}
 
@@ -239,10 +357,10 @@ def count_snps_by_chr(
     if filter_fields is not None:
         params["filter_fields"] = ",".join(filter_fields)
 
-    response = requests.post(url, params=params)
+    response = requests.get(url, params=params)
     response.raise_for_status()
 
-    if 'details' not in response.json():
+    if "details" not in response.json():
         raise ValueError(f"Unexpected response from server: {response.json()}")
 
     return response.json()["details"]
@@ -262,7 +380,7 @@ def count_snps_by_rsid_list(
     Returns:
         The count of SNPs matching the criteria.
     """
-    url = f"{BASE_URL}/fastapi/count/rsidList"
+    url = f"{BASE_URL}/count/rsidList"
 
     params = {}
 
@@ -275,10 +393,10 @@ def count_snps_by_rsid_list(
     if filter_fields is not None:
         params["filter_fields"] = ",".join(filter_fields)
 
-    response = requests.post(url, params=params)
+    response = requests.get(url, params=params)
     response.raise_for_status()
 
-    if 'details' not in response.json():
+    if "details" not in response.json():
         raise ValueError(f"Unexpected response from server: {response.json()}")
 
     return response.json()["details"]
@@ -297,7 +415,7 @@ def count_snps_by_gene_product(
     Returns:
         The count of SNPs matching the criteria.
     """
-    url = f"{BASE_URL}/fastapi/count/gene_product"
+    url = f"{BASE_URL}/count/gene_product"
 
     params = {}
 
@@ -307,10 +425,10 @@ def count_snps_by_gene_product(
     if filter_fields is not None:
         params["filter_fields"] = ",".join(filter_fields)
 
-    response = requests.post(url, params=params)
+    response = requests.get(url, params=params)
     response.raise_for_status()
 
-    if 'details' not in response.json():
+    if "details" not in response.json():
         raise ValueError(f"Unexpected response from server: {response.json()}")
 
     return response.json()["details"]
