@@ -1,223 +1,145 @@
-This is a Python package for annoq-api-v2
+# Annoq API Python Client
 
-# Local Usage
+A Python package for accessing SNP data from Annoq.org
 
-Clone this repository
-```
-git clone https://github.com/USCbiostats/annoq-py.git
-```
+## Installation
 
-Install the package 
-```
-pip install .
+```bash
+pip install annoq-py
 ```
 
-Open python on the terminal and import the package
-```
-python 
->>> from src.annoq import annoq
-```
+## Usage
 
-To run the tests
-```
-python -m pytest test/test.py
-```
+### Getting Started
 
-## Get SNP by Chromosome Query
-GetSNPsByChromosome(self, chr, start, end, fields, filter=None, page_from=None, page_size=None)
+```python
+import annoq
 
-Returns list of json
-
-Scrolling is done if page is more than 10k
-
-#### Parameters
-
-**chr: str** -  Chromosome string
-
-**start: int** - Start of chromosome
-
-**end: int** - End of chromosome
-
-**fields: list[str]** - List of strings with the fields that you
-
-**filter: list[str] (optional)** - List of strings with fields that you want to filter on
-
-**page_from: int (optional)** - Starting page number
-
-**page_size: int (optional)** - Size of the page
-```
-annoq().get_SNPs_by_chromosome(chr="2", start=1, end=10000000, fields=['chr', 'ref', 'pos', 'rs_dbSNP151', 'ANNOVAR_ensembl_Effect', 'ANNOVAR_refseq_Effect'], query_type_option='SCROLL', filter=['chr'], page_from=2, page_size=4)
+# Get available SNP attributes
+attributes = annoq.get_snp_attributes()
+print(attributes)
 ```
 
+### Get SNP Attributes
 
-## Get SNP by Gene Product Query
-GetSNPsByGeneProduct(self, gene, fields, filter=None, page_from=None, page_size=None)
-
-Returns list of json
-
-Scrolling is done if page is more than 10k
-
-#### Parameters 
-
-**gene: str** -  Gene product string
-
-**fields: list[str]** - List of strings with the fields that you
-
-
-**filter: list[str] (optional)** - List of strings with fields that you want to filter on
-
-**page_from: int (optional)** - Starting page number
-
-**page_size: int (optional)** - Size of the page
-
-```
-annoq().get_SNPs_by_gene_product(gene="Q9BVC4", fields=["chr", "id"], filter=["chr", "pos"], page_from=0, page_size=10)
+```python
+# Retrieve available SNP attributes
+attributes = annoq.get_snp_attributes()
 ```
 
-## Get SNP by ID Query
-GetSNPsByIDs(self, ids, fields, filter=None, page_from=None, page_size=None)
+### Search SNPs by Chromosome
 
-Returns list of json
+```python
+# Search SNPs on chromosome 1 from position 1 to 100000
+snps = annoq.get_snps_by_chr(
+    chromosome_identifier="1",
+    start_position=1,
+    end_position=100000
+)
 
-Scrolling is done if page is more than 10k
+# With custom fields (as a list)
+snps = annoq.get_snps_by_chr(
+    chromosome_identifier="1",
+    start_position=1,
+    end_position=10000,
+    fields=["chr", "pos", "ref", "alt", "rs_dbSNP151"]
+)
 
-#### Parameters 
+# With custom fields (as JSON string)
+snps = annoq.get_snps_by_chr(
+    chromosome_identifier="1",
+    start_position=1,
+    end_position=1000,
+    fields='{"_source":["chr", "pos", "ref", "alt", "rs_dbSNP151"]}'
+)
 
-**ids: list[str]** -  List of IDs
-
-**fields: list[str]** - List of strings with the fields that you
-
-**filter: list[str] (optional)** - List of strings with fields that you want to filter on
-
-**page_from: int (optional)** - Starting page number
-
-**page_size: int (optional)** - Size of the page
-
-```
-annoq().get_SNPs_by_IDs(ids=["2:10632C>A", "16:2255492G>A"], fields=["id", "chr"], query_type_option='SNPS', filter=["chr"], page_from=0, page_size=5)
-```
-
-## Get SNP by RsID Query
-GetSNPsByRsID(self, rsID, fields, filter=None, page_from=None, page_size=None)
-
-Returns list of json
-
-Scrolling is done if page is more than 10k
-
-#### Parameters 
-
-**rsID: str** -  rsID string
-
-**fields: list[str]** - List of strings with the fields that you
-
-**filter: list[str] (optional)** - List of strings with fields that you want to filter on
-
-**page_from: int (optional)** - Starting page number
-
-**page_size: int (optional)** - Size of the page
-
-```
-annoq().get_SNPs_by_RsID(rsID='rs189126619', fields=["rs_dbSNP151", "ref"], filter=["rs_dbSNP151"], page_from=0, page_size=2)
+# With custom fields (from file path)
+snps = annoq.get_snps_by_chr(
+    chromosome_identifier="1",
+    start_position=1,
+    end_position=100000,
+    fields="/path/to/fields_config.json"
+)
 ```
 
-## Get SNP by RsIDs Query
-GetSNPsByRsIDs(self, rsIDs, fields, filter=None, page_from=None, page_size=None)
+### Search SNPs by RSID List
 
-Returns list of json
+```python
+# Search by RSID list (as string)
+snps = annoq.get_snps_by_rsid_list(
+    rsid_list="rs1219648,rs2912774,rs2981582"
+)
 
-Scrolling is done if page is more than 10k
-
-#### Parameters 
-
-**rsIDs: list[str]** -  list of rsIDs
-
-**fields: list[str]** - List of strings with the fields that you
-
-**filter: list[str] (optional)**- List of strings with fields that you want to filter on
-
-**page_from: int (optional)** - Starting page number
-
-**page_size: int (optional)** - Size of the page
-
-```
-annoq().get_SNPs_by_RsIDs(rsIDs=['rs189126619', 'rs115366554'], fields=["rs_dbSNP151", "ref"], query_type_option='SNPS', filter=["rs_dbSNP151"], page_from=0, page_size=2)
+# Search by RSID list (as list)
+snps = annoq.get_snps_by_rsid_list(
+    rsid_list=["rs1219648", "rs291274", "rs2981582"]
+)
 ```
 
-## Count SNP by Chromosome Query
-count_SNPs_by_chromosome(self, chr, start, end, filter)
+### Search SNPs by Gene Product
 
-return int
-
-#### Parameters
-
-**chr: str** -  Chromosome string
-
-**start: int** - Start of chromosome
-
-**end: int** - End of chromosome
-
-**filter: list[str] (optional)** - List of strings with fields that you want to filter on
-
-```
-annoq().count_SNPs_by_chromosome(chr="2", start=1, end=10000000, filter=["chr", "ANNOVAR_ensembl_Closest_gene(intergenic_only)"])
+```python
+# Search SNPs by gene product
+snps = annoq.get_snps_by_gene_product(
+    gene="ZMYND11"
+)
 ```
 
-## Count SNP by Gene Product Query
-count_SNPs_by_gene_product(self, gene, filter)
+### Count SNPs
 
-return int
+```python
+# Count SNPs by chromosome
+count_result = annoq.count_snps_by_chr(
+    chromosome_identifier="1",
+    start_position=1,
+    end_position=100000
+)
 
-#### Parameters
+# Count SNPs by RSID list
+count_result = annoq.count_snps_by_rsid_list(
+    rsid_list=["rs1219648", "rs2912774"]
+)
 
-**gene: str** -  Gene product string
-
-**filter: list[str]  (optional)** - List of strings with fields that you want to filter on
-
-```
-annoq().count_SNPs_by_gene_product(gene="Q9BVC4", filter=["chr", "pos"])
-```
-
-## Count SNP by ID Query
-count_SNPs_by_IDs(self, ids, filter)
-
-return int
-
-#### Parameters
-
-**ids: list[str]** -  List of IDs
-
-**filter: list[str]  (optional)** - List of strings with fields that you want to filter on
-
-```
-annoq().count_SNPs_by_IDs(ids=["2:10632C>A", "2:10632C>A"], filter=["chr"])
+# Count SNPs by gene product
+count_result = annoq.count_snps_by_gene_product(
+    gene="ZMYND11"
+)
 ```
 
-## Count SNP by RsID Query
-count_SNPs_by_RsID(self, rsID, filter)
+### Filter Fields
 
-return int
+You can also filter results to only include records where specific fields are not empty:
 
-#### Parameters
-
-**rsID: str** -  rsID string
-
-**filter: list[str]  (optional)** - List of strings with fields that you want to filter on
-
+```python
+# Filter to only include records with non-empty annotation fields
+snps = annoq.get_snps_by_chr(
+    chromosome_identifier="1",
+    start_position=1,
+    end_position=100000,
+    filter_fields="ANNOVAR_ucsc_Transcript_ID,VEP_ensembl_Gene_ID"
+)
 ```
-annoq().count_SNPs_by_RsID(rsID='rs189126619', filter=["rs_dbSNP151"])
-```
 
-## Count SNP by RsIDs Query
-count_SNPs_by_RsIDs(self, rsIDs, filter)
+## API Functions
 
-return int
+The package provides 7 main functions:
 
-#### Parameters
+1. `get_snp_attributes()` - Retrieve available SNP attributes
+2. `get_snps_by_chr()` - Get SNPs by chromosome and position range
+3. `get_snps_by_rsid_list()` - Get SNPs by RSID list
+4. `get_snps_by_gene_product()` - Get SNPs by gene product
+5. `count_snps_by_chr()` - Count SNPs by chromosome and position range
+6. `count_snps_by_rsid_list()` - Count SNPs by RSID list
+7. `count_snps_by_gene_product()` - Count SNPs by gene product
 
-**rsIDs: list[str]** -  list of rsIDs
+## Fields Parameter
 
-**filter: list[str]  (optional)** - List of strings with fields that you want to filter on
+The `fields` parameter accepts three formats:
 
-```
-annoq().count_SNPs_by_RsIDs(rsIDs=['rs189126619', 'rs115366554'], filter=["rs_dbSNP151"])
-```
+- **List of attributes**: `["chr", "pos", "ref", "alt"]`
+- **JSON string**: `'{"_source":["chr", "pos", "ref", "alt"]}'`
+- **File path**: `"/path/to/config.json"` (file containing the JSON config)
+
+## License
+
+MIT License
