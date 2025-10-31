@@ -1,4 +1,4 @@
-# Annoq Python Client
+# Annoq-py
 
 A Python package for programmatically accessing SNP data from the Annoq API.
 
