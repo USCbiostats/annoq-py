@@ -97,7 +97,7 @@ def get_snps_by_chr(
     start_position: Optional[int] = None,
     end_position: Optional[int] = None,
     fields: Union[str, List[str], None] = None,
-    filter_fields: Optional[list[str]] = None,
+    filter_fields: Optional[List[str]] = None,
     pagination_from: int = 0,
     pagination_size: int = 1000,
     fetch_all: bool = False,
@@ -177,7 +177,7 @@ def get_snps_by_chr(
 def get_snps_by_rsid_list(
     rsid_list: Union[str, List[str]],
     fields: Union[str, List[str], None] = None,
-    filter_fields: Optional[list[str]] = None,
+    filter_fields: Optional[List[str]] = None,
     pagination_from: int = 0,
     pagination_size: int = 1000,
     fetch_all: bool = False,
@@ -255,7 +255,7 @@ def get_snps_by_rsid_list(
 def get_snps_by_gene_product(
     gene: str,
     fields: Union[str, List[str], None] = None,
-    filter_fields: Optional[list[str]] = None,
+    filter_fields: Optional[List[str]] = None,
     pagination_from: int = 0,
     pagination_size: int = 1000,
     fetch_all: bool = False,
@@ -331,7 +331,7 @@ def count_snps_by_chr(
     chromosome_identifier: str,
     start_position: Optional[int] = None,
     end_position: Optional[int] = None,
-    filter_fields: Optional[list[str]] = None,
+    filter_fields: Optional[List[str]] = None,
 ) -> int:
     """
     Count SNPs based on specified chromosome, start position, end position and filter arguments.
@@ -368,7 +368,7 @@ def count_snps_by_chr(
 
 def count_snps_by_rsid_list(
     rsid_list: Union[str, List[str]],
-    filter_fields: Optional[list[str]] = None,
+    filter_fields: Optional[List[str]] = None,
 ) -> int:
     """
     Count the number of SNPs defined in the system that have matching RSIDs from the specified list.
@@ -403,7 +403,7 @@ def count_snps_by_rsid_list(
 
 
 def count_snps_by_gene_product(
-    gene: str, filter_fields: Optional[list[str]] = None
+    gene: str, filter_fields: Optional[List[str]] = None
 ) -> int:
     """
     Count the number of SNPs defined in the system that have been associated for the specified gene product.
