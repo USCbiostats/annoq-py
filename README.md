@@ -1,6 +1,6 @@
 # annoq-py
 
-A Python package for programmatically accessing SNP data from the Annoq API.
+A Python package for programmatically accessing SNP data from the AnnoQ API.
 
 ## Installation
 
@@ -108,7 +108,7 @@ snps = annoq.get_snps_by_chr(
 )
 ```
 
-**As a string config exported from [Annoq](https://annoq.org):**
+**As a string config exported from [AnnoQ](https://annoq.org):**
 
 ```python
 snps = annoq.get_snps_by_chr(
@@ -119,10 +119,10 @@ snps = annoq.get_snps_by_chr(
 )
 ```
 
-**From a JSON config exported from [Annoq](https://annoq.org):**
+**From a JSON config exported from [AnnoQ](https://annoq.org):**
 
 ```python
-# Export the config file: config.txt from Annoq
+# Export the config file: config.txt from AnnoQ
 # {"_source":["chr", "pos", "ref", "alt", "rs_dbSNP151"]}
 
 snps = annoq.get_snps_by_chr(
@@ -508,4 +508,4 @@ This package is licensed under the MIT License.
 
 ## Support
 
-For questions or issues related to Annoq itself, please visit the site [Annoq](https://annoq.org)
+For questions or issues related to AnnoQ itself, please visit the site [AnnoQ](https://annoq.org)
