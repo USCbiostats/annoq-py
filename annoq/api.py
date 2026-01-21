@@ -10,7 +10,7 @@ from typing import Union, List, Dict, Any, Optional
 
 
 # Base URL for the Annoq API
-BASE_URL = "https://api-v2-dev.annoq.org"
+BASE_URL = "https://api-v2.annoq.org"
 
 
 def _process_fields_param(fields: Union[str, List[str], None]) -> Optional[str]:
