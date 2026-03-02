@@ -5,12 +5,15 @@ A Python package for accessing SNP data from Annoq.org
 """
 
 import json
+import os
 import requests
+from dotenv import load_dotenv
 from typing import Union, List, Dict, Any, Optional
 
+load_dotenv()
 
 # Base URL for the Annoq API
-BASE_URL = "https://api-v2.annoq.org"
+BASE_URL = os.environ.get("ANNOQ_BASE_URL", "https://api-v2.annoq.org")
 
 
 def _process_fields_param(fields: Union[str, List[str], None]) -> Optional[str]:
