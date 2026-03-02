@@ -17,18 +17,18 @@ pip install git+https://github.com/USCbiostats/annoq-py.git
 
 ## Configuration
 
-By default, the package connects to `https://api-v2.annoq.org`. To use a different API endpoint, set the `ANNOQ_BASE_URL` environment variable.
+By default, the package connects to `https://api-v2.annoq.org`. To use the TopMed API endpoint, set the `ANNOQ_BASE_URL` environment variable to refer to `https://api-v2.topmed.annoq.org`.
 
-**Option 1: Create a `.env` file** in your project root:
+**Option 1: Create a `.env` file** in your project root and set it the TopMed API:
 
 ```
-ANNOQ_BASE_URL=https://your-custom-api-url.example.com
+ANNOQ_BASE_URL=https://api-v2.topmed.annoq.org
 ```
 
 **Option 2: Set the variable in your shell:**
 
 ```bash
-export ANNOQ_BASE_URL=https://your-custom-api-url.example.com
+export ANNOQ_BASE_URL=https://api-v2.topmed.annoq.org
 ```
 
 If `ANNOQ_BASE_URL` is not set, the default URL is used automatically. See `.env.example` for reference.
