@@ -5,12 +5,15 @@ A Python package for accessing SNP data from Annoq.org
 """
 
 import json
+import os
+import re
 import requests
 from typing import Union, List, Dict, Any, Optional
 
 
 # Base URL for the Annoq API
 BASE_URL = "https://api-v2.annoq.org"
+DEFAULT_SNPWAY_BASE_URL = "https://enrichment-dev.annoq.org"
 
 
 def _process_fields_param(fields: Union[str, List[str], None]) -> Optional[str]:
@@ -432,3 +435,512 @@ def count_snps_by_gene_product(
         raise ValueError(f"Unexpected response from server: {response.json()}")
 
     return response.json()["details"]
+
+
+def _resolve_snpway_base_url(base_url: Optional[str]) -> str:
+    if base_url and base_url.strip():
+        return base_url.strip().rstrip("/")
+
+    env_value = os.getenv("ANNOQ_SNPWAY_BASE_URL", "").strip()
+    if env_value:
+        return env_value.rstrip("/")
+
+    return DEFAULT_SNPWAY_BASE_URL.rstrip("/")
+
+
+def _normalize_chromosome_label(raw_chromosome: str) -> str:
+    normalized = str(raw_chromosome).strip()
+    if not normalized:
+        return ""
+    return re.sub(r"^chr", "", normalized, flags=re.IGNORECASE)
+
+
+def _unique_preserve_order(items: List[str]) -> List[str]:
+    seen = set()
+    result: List[str] = []
+    for item in items:
+        if item in seen:
+            continue
+        seen.add(item)
+        result.append(item)
+    return result
+
+
+def _parse_vcf_to_ids(vcf_text: str) -> List[str]:
+    ids: List[str] = []
+
+    for line in vcf_text.splitlines():
+        trimmed = line.strip()
+        if not trimmed or trimmed.startswith("#"):
+            continue
+
+        fields = trimmed.split("\t")
+        if len(fields) < 2:
+            fields = re.split(r"\s+", trimmed)
+        if len(fields) < 2:
+            continue
+
+        chrom = _normalize_chromosome_label(fields[0])
+        pos = str(fields[1]).strip()
+
+        if not chrom or not pos.isdigit():
+            continue
+
+        ids.append(f"{chrom}:{pos}")
+
+    return _unique_preserve_order(ids)
+
+
+def _normalize_rsid_list(rsid_list: Union[str, List[str]]) -> List[str]:
+    if isinstance(rsid_list, list):
+        parsed = [str(rsid).strip() for rsid in rsid_list if str(rsid).strip()]
+        return _unique_preserve_order(parsed)
+
+    parsed = [
+        segment.strip() for segment in re.split(r"[\s,]+", rsid_list) if segment.strip()
+    ]
+    return _unique_preserve_order(parsed)
+
+
+def _build_snpway_payload(
+    vcf_text: Optional[str],
+    chrom_pos_ids: Optional[List[str]],
+    chromosome_identifier: Optional[str],
+    start_position: Optional[int],
+    end_position: Optional[int],
+    rsid_list: Union[str, List[str], None],
+) -> Dict[str, Any]:
+    modes_used = 0
+
+    has_vcf = bool(vcf_text and vcf_text.strip())
+    has_chrom_pos = bool(chrom_pos_ids)
+    has_region = (
+        chromosome_identifier is not None
+        or start_position is not None
+        or end_position is not None
+    )
+    has_rsid = rsid_list is not None
+
+    modes_used += 1 if has_vcf else 0
+    modes_used += 1 if has_chrom_pos else 0
+    modes_used += 1 if has_region else 0
+    modes_used += 1 if has_rsid else 0
+
+    if modes_used != 1:
+        raise ValueError(
+            "Provide exactly one SNP input mode: vcf_text, chrom_pos_ids, "
+            "chromosome range (chromosome_identifier/start_position/end_position), "
+            "or rsid_list."
+        )
+
+    if has_vcf:
+        ids = _parse_vcf_to_ids(vcf_text or "")
+        if not ids:
+            raise ValueError("No valid CHROM/POS entries were found in vcf_text.")
+        return {
+            "input_type": "ids",
+            "idsQuery": {"ids": ids},
+        }
+
+    if has_chrom_pos:
+        normalized_ids = []
+        for raw_id in chrom_pos_ids or []:
+            normalized_id = str(raw_id).strip()
+            if normalized_id:
+                normalized_ids.append(normalized_id)
+        normalized_ids = _unique_preserve_order(normalized_ids)
+        if not normalized_ids:
+            raise ValueError("chrom_pos_ids must contain at least one non-empty ID.")
+        return {
+            "input_type": "ids",
+            "idsQuery": {"ids": normalized_ids},
+        }
+
+    if has_region:
+        if (
+            chromosome_identifier is None
+            or start_position is None
+            or end_position is None
+        ):
+            raise ValueError(
+                "chromosome_identifier, start_position, and end_position are required "
+                "when using chromosome range input mode."
+            )
+
+        normalized_chr = _normalize_chromosome_label(chromosome_identifier)
+        if not normalized_chr:
+            raise ValueError("chromosome_identifier cannot be empty.")
+
+        return {
+            "input_type": "chromosome",
+            "chrQuery": {
+                "chr": normalized_chr,
+                "start": int(start_position),
+                "end": int(end_position),
+            },
+        }
+
+    normalized_rsids = _normalize_rsid_list(rsid_list or [])
+    if not normalized_rsids:
+        raise ValueError("rsid_list must contain at least one rsID.")
+
+    return {
+        "input_type": "rsIdList",
+        "rsIdListQuery": {"rsIdList": normalized_rsids},
+    }
+
+
+def _parse_error_detail(response: requests.Response) -> str:
+    try:
+        response_payload = response.json()
+        if isinstance(response_payload, dict) and "detail" in response_payload:
+            return str(response_payload["detail"])
+    except ValueError:
+        pass
+
+    fallback = response.text.strip()
+    if fallback:
+        return fallback
+
+    return f"Request failed with status {response.status_code}."
+
+
+def _post_snpway_request(
+    endpoint: str,
+    payload: Dict[str, Any],
+    base_url: Optional[str],
+    timeout_seconds: int,
+) -> Dict[str, Any]:
+    resolved_base_url = _resolve_snpway_base_url(base_url)
+    url = f"{resolved_base_url}{endpoint}"
+
+    try:
+        response = requests.post(url, json=payload, timeout=timeout_seconds)
+    except requests.RequestException as exc:
+        raise ValueError(f"Failed to reach SNPWay API at {url}: {exc}") from exc
+
+    if not response.ok:
+        raise ValueError(_parse_error_detail(response))
+
+    try:
+        response_data = response.json()
+    except ValueError as exc:
+        raise ValueError("SNPWay API returned a non-JSON response.") from exc
+
+    if not isinstance(response_data, dict):
+        raise ValueError("SNPWay API returned an unexpected response shape.")
+
+    return response_data
+
+
+def _get_relevant_columns(annotation_dataset: Optional[str]) -> List[str]:
+    base_columns = ["rsId", "PANTHER_ID", "mappedGenes"]
+
+    all_columns = [
+        *base_columns,
+        "PANTHER_family",
+        "PANTHER_Subfamily",
+        "PANTHER_Pathway",
+        "Protein_Class",
+        "Reactome_Pathway",
+        "GO_database_MF_complete",
+        "GO_database_BP_complete",
+        "GO_database_CC_complete",
+        "PANTHER_GO_slim_Molecular_Function",
+        "PANTHER_GO_slim_Biological_Process",
+        "PANTHER_GO_slim_Cellular_Component",
+    ]
+
+    if annotation_dataset is None:
+        return all_columns
+
+    dataset_column_map = {
+        "GO:0008150": [*base_columns, "GO_database_BP_complete"],
+        "GO:0003674": [*base_columns, "GO_database_MF_complete"],
+        "GO:0005575": [*base_columns, "GO_database_CC_complete"],
+        "ANNOT_TYPE_ID_PANTHER_PATHWAY": [*base_columns, "PANTHER_Pathway"],
+        "ANNOT_TYPE_ID_PANTHER_GO_SLIM_MF": [
+            *base_columns,
+            "PANTHER_GO_slim_Molecular_Function",
+        ],
+        "ANNOT_TYPE_ID_PANTHER_GO_SLIM_BP": [
+            *base_columns,
+            "PANTHER_GO_slim_Biological_Process",
+        ],
+        "ANNOT_TYPE_ID_PANTHER_GO_SLIM_CC": [
+            *base_columns,
+            "PANTHER_GO_slim_Cellular_Component",
+        ],
+        "ANNOT_TYPE_ID_PANTHER_PC": [*base_columns, "Protein_Class"],
+        "ANNOT_TYPE_ID_REACTOME_PATHWAY": [*base_columns, "Reactome_Pathway"],
+    }
+
+    return dataset_column_map.get(annotation_dataset, all_columns)
+
+
+def _create_results_table_data(
+    response_data: Dict[str, Any],
+    panther_ids_to_include: Optional[List[str]] = None,
+    annotation_dataset: Optional[str] = None,
+) -> List[Dict[str, Any]]:
+    rs_id_genes_map = response_data.get("rsId_genes_map", {})
+    panther_gene_info = response_data.get("panther_gene_info", {})
+    gene_panther_mapping = response_data.get("gene_panther_mapping", {})
+
+    if not isinstance(rs_id_genes_map, dict):
+        rs_id_genes_map = {}
+    if not isinstance(panther_gene_info, dict):
+        panther_gene_info = {}
+    if not isinstance(gene_panther_mapping, dict):
+        gene_panther_mapping = {}
+
+    panther_ids_set = (
+        set(panther_ids_to_include) if panther_ids_to_include is not None else None
+    )
+    table_data: List[Dict[str, Any]] = []
+    processed_pairs: set[str] = set()
+
+    for rs_id, genes_for_rs_id in rs_id_genes_map.items():
+        if not isinstance(genes_for_rs_id, list):
+            continue
+
+        for gene in genes_for_rs_id:
+            panther_ids_for_gene = gene_panther_mapping.get(gene, [])
+            if not isinstance(panther_ids_for_gene, list):
+                continue
+
+            for panther_id in panther_ids_for_gene:
+                panther_id = str(panther_id).strip()
+                if not panther_id:
+                    continue
+
+                if panther_ids_set is not None and panther_id not in panther_ids_set:
+                    continue
+
+                pair_key = f"{rs_id}-{panther_id}"
+                if pair_key in processed_pairs:
+                    continue
+                processed_pairs.add(pair_key)
+
+                mapped_genes = [
+                    mapped_gene
+                    for mapped_gene in genes_for_rs_id
+                    if panther_id in gene_panther_mapping.get(mapped_gene, [])
+                ]
+
+                gene_info = panther_gene_info.get(panther_id)
+                if not isinstance(gene_info, dict):
+                    continue
+
+                table_data.append(
+                    {
+                        "rsId": rs_id,
+                        "PANTHER_ID": panther_id,
+                        "mappedGenes": mapped_genes,
+                        "PANTHER_family": gene_info.get("PANTHER_family", ""),
+                        "PANTHER_Subfamily": gene_info.get("PANTHER_Subfamily", ""),
+                        "PANTHER_Pathway": gene_info.get("PANTHER_Pathway", ""),
+                        "Protein_Class": gene_info.get("Protein_Class", ""),
+                        "Reactome_Pathway": gene_info.get("Reactome_Pathway", ""),
+                        "GO_database_MF_complete": gene_info.get(
+                            "GO_database_MF_complete", ""
+                        ),
+                        "GO_database_BP_complete": gene_info.get(
+                            "GO_database_BP_complete", ""
+                        ),
+                        "GO_database_CC_complete": gene_info.get(
+                            "GO_database_CC_complete", ""
+                        ),
+                        "PANTHER_GO_slim_Molecular_Function": gene_info.get(
+                            "PANTHER_GO_slim_Molecular_Function", ""
+                        ),
+                        "PANTHER_GO_slim_Biological_Process": gene_info.get(
+                            "PANTHER_GO_slim_Biological_Process", ""
+                        ),
+                        "PANTHER_GO_slim_Cellular_Component": gene_info.get(
+                            "PANTHER_GO_slim_Cellular_Component", ""
+                        ),
+                    }
+                )
+
+    if annotation_dataset is None:
+        return table_data
+
+    selected_columns = _get_relevant_columns(annotation_dataset)
+    return [
+        {column: row.get(column, "") for column in selected_columns}
+        for row in table_data
+    ]
+
+
+def _get_significant_results(
+    rows: List[Dict[str, Any]], correction: str
+) -> List[Dict[str, Any]]:
+    correction_name = str(correction).upper()
+
+    if correction_name == "FDR":
+        return [row for row in rows if float(row.get("fdr", 0.0)) < 0.05]
+
+    return [row for row in rows if float(row.get("pValue", 0.0)) < 0.05]
+
+
+def _get_significant_genes(rows: List[Dict[str, Any]]) -> List[str]:
+    unique_rows_by_term: Dict[str, Dict[str, Any]] = {}
+
+    for row in rows:
+        key = str(row.get("termId") or row.get("process") or "")
+        if key and key not in unique_rows_by_term:
+            unique_rows_by_term[key] = row
+
+    genes: List[str] = []
+    seen_genes = set()
+    for row in unique_rows_by_term.values():
+        for gene in row.get("mapped_ids", []):
+            normalized_gene = str(gene).strip()
+            if normalized_gene and normalized_gene not in seen_genes:
+                seen_genes.add(normalized_gene)
+                genes.append(normalized_gene)
+
+    return genes
+
+
+def _build_panther_id_filter_from_genes(
+    gene_panther_mapping: Dict[str, Any], genes_to_include: Optional[List[str]]
+) -> List[str]:
+    if genes_to_include is None:
+        return []
+
+    normalized_genes = [
+        gene.strip() for gene in genes_to_include if gene and gene.strip()
+    ]
+    if not normalized_genes:
+        return []
+
+    panther_ids: List[str] = []
+    seen_panther_ids = set()
+
+    for gene in normalized_genes:
+        for panther_id in gene_panther_mapping.get(gene, []):
+            normalized_panther_id = str(panther_id).strip()
+            if normalized_panther_id and normalized_panther_id not in seen_panther_ids:
+                seen_panther_ids.add(normalized_panther_id)
+                panther_ids.append(normalized_panther_id)
+
+    return panther_ids
+
+
+def get_snpway_gene_mappings(
+    *,
+    vcf_text: Optional[str] = None,
+    chrom_pos_ids: Optional[List[str]] = None,
+    chromosome_identifier: Optional[str] = None,
+    start_position: Optional[int] = None,
+    end_position: Optional[int] = None,
+    rsid_list: Union[str, List[str], None] = None,
+    base_url: Optional[str] = None,
+    timeout_seconds: int = 120,
+) -> Dict[str, Any]:
+    """
+    Run SNPWay mapping workflow and return SNP-to-gene and PANTHER mappings.
+
+    Exactly one input mode must be provided:
+    - vcf_text
+    - chrom_pos_ids
+    - chromosome range (chromosome_identifier, start_position, end_position)
+    - rsid_list
+    """
+
+    payload = _build_snpway_payload(
+        vcf_text=vcf_text,
+        chrom_pos_ids=chrom_pos_ids,
+        chromosome_identifier=chromosome_identifier,
+        start_position=start_position,
+        end_position=end_position,
+        rsid_list=rsid_list,
+    )
+
+    return _post_snpway_request(
+        endpoint="/workflow/gene_mappings",
+        payload=payload,
+        base_url=base_url,
+        timeout_seconds=timeout_seconds,
+    )
+
+
+def run_snpway_overrepresentation_workflow(
+    *,
+    annot_data_set: str = "GO:0008150",
+    correction: str = "FDR",
+    enrichment_test_type: str = "FISHER",
+    vcf_text: Optional[str] = None,
+    chrom_pos_ids: Optional[List[str]] = None,
+    chromosome_identifier: Optional[str] = None,
+    start_position: Optional[int] = None,
+    end_position: Optional[int] = None,
+    rsid_list: Union[str, List[str], None] = None,
+    base_url: Optional[str] = None,
+    timeout_seconds: int = 300,
+) -> Dict[str, Any]:
+    """
+    Run full SNPWay overrepresentation workflow and return normalized outputs.
+
+    The backend response is compact; this helper adds convenience views locally:
+    - all overrepresentation results
+    - significant overrepresentation results
+    - CSV-ready all/significant mapping rows
+    """
+
+    payload = _build_snpway_payload(
+        vcf_text=vcf_text,
+        chrom_pos_ids=chrom_pos_ids,
+        chromosome_identifier=chromosome_identifier,
+        start_position=start_position,
+        end_position=end_position,
+        rsid_list=rsid_list,
+    )
+
+    payload["annotDataSet"] = annot_data_set
+    payload["correction"] = correction
+    payload["enrichmentTestType"] = enrichment_test_type
+
+    response_data = _post_snpway_request(
+        endpoint="/workflow/overrepresentation",
+        payload=payload,
+        base_url=base_url,
+        timeout_seconds=timeout_seconds,
+    )
+
+    overrepresentation_results = response_data.get("overrepresentation_results", [])
+    if not isinstance(overrepresentation_results, list):
+        overrepresentation_results = []
+
+    significant_results = _get_significant_results(
+        overrepresentation_results, correction
+    )
+    significant_genes = _get_significant_genes(significant_results)
+    significant_panther_ids = _build_panther_id_filter_from_genes(
+        response_data.get("gene_panther_mapping", {}), significant_genes
+    )
+
+    response_data["overrepresentation_all_results"] = overrepresentation_results
+    response_data["overrepresentation_significant_results"] = significant_results
+    response_data["csv_all_mappings"] = _create_results_table_data(
+        response_data,
+        annotation_dataset=annot_data_set,
+    )
+    response_data["csv_all_mappings_all_columns"] = _create_results_table_data(
+        response_data,
+        annotation_dataset=None,
+    )
+    response_data["csv_significant_mappings"] = _create_results_table_data(
+        response_data,
+        panther_ids_to_include=significant_panther_ids,
+        annotation_dataset=annot_data_set,
+    )
+    response_data["csv_significant_mappings_all_columns"] = _create_results_table_data(
+        response_data,
+        panther_ids_to_include=significant_panther_ids,
+        annotation_dataset=None,
+    )
+
+    return response_data

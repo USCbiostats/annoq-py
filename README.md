@@ -1,6 +1,6 @@
 # annoq-py
 
-A Python package for programmatically accessing SNP data from the AnnoQ API.
+A Python package for programmatically accessing SNP data from the AnnoQ API and workflows built on top of those APIs.
 
 ## Installation
 
@@ -33,7 +33,7 @@ snps = annoq.get_snps_by_chr(
 
 ## Core Functions
 
-The package provides 7 main functions organized into three categories:
+The package provides 9 main functions organized into four categories:
 
 ### Attribute Discovery
 
@@ -50,6 +50,72 @@ The package provides 7 main functions organized into three categories:
 - `count_snps_by_chr()` - Count SNPs by chromosome
 - `count_snps_by_rsid_list()` - Count SNPs by RSID list
 - `count_snps_by_gene_product()` - Count SNPs by gene
+
+### SNPWay Workflow
+- `get_snpway_gene_mappings()` - SNPWay mapping workflow (SNP -> gene + PANTHER mappings)
+- `run_snpway_overrepresentation_workflow()` - Full SNPWay workflow (compact backend payload plus locally derived significant and CSV-ready outputs)
+
+## SNPWay Workflow Usage
+
+Visit [SNPWay](https://snpway.annoq.org/) for more details on the workflow and its frontend interface. The Python package provides programmatic access to the same workflows powering the SNPWay web app.
+
+SNPWay functions call the backend workflow API and support these input modes:
+
+- `vcf_text`
+- `chrom_pos_ids` (for `chr:pos` lists)
+- chromosome range (`chromosome_identifier`, `start_position`, `end_position`)
+- `rsid_list`
+
+Exactly one input mode must be provided per call.
+
+Default base URL is `https://enrichment-dev.annoq.org`.
+
+- Override per call with `base_url=...`
+- Override globally with environment variable `ANNOQ_SNPWAY_BASE_URL`
+
+### Example: Mapping workflow
+
+```python
+import annoq
+
+mapping = annoq.get_snpway_gene_mappings(
+    rsid_list=["rs1219648", "rs2912774", "rs2981582"]
+)
+
+print(mapping.keys())
+# dict_keys(['gene_list', 'rsId_genes_map', 'panther_gene_info', 'gene_panther_mapping'])
+```
+
+### Example: Full overrepresentation workflow
+
+```python
+import annoq
+
+workflow = annoq.run_snpway_overrepresentation_workflow(
+    rsid_list="rs1219648, rs2912774, rs2981582",
+    annot_data_set="GO:0008150",
+    correction="FDR",
+    enrichment_test_type="FISHER",
+)
+
+print(len(workflow["overrepresentation_results"]))
+print(len(workflow["overrepresentation_significant_results"]))
+print(len(workflow["csv_all_mappings"]))
+```
+
+### Example: VCF text input
+
+```python
+import annoq
+
+vcf_text = """##fileformat=VCFv4.2
+#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO
+1\t115921355\t.\tA\tG\t.\t.\t.
+1\t12046063\t.\tC\tT\t.\t.\t.
+"""
+
+mapping = annoq.get_snpway_gene_mappings(vcf_text=vcf_text)
+```
 
 ---
 
