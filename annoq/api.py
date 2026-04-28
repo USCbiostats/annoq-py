@@ -633,6 +633,19 @@ def _post_snpway_request(
     return response_data
 
 
+def _build_snpway_mapping_response(response_data: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "mapping": {
+            "gene_list": response_data.get("gene_list", []),
+            "variant_gene_map": response_data.get("rsId_genes_map", {}),
+        },
+        "panther": {
+            "gene_info": response_data.get("panther_gene_info", {}),
+            "gene_to_panther_map": response_data.get("gene_panther_mapping", {}),
+        },
+    }
+
+
 def _get_relevant_columns(annotation_dataset: Optional[str]) -> List[str]:
     base_columns = ["rsId", "PANTHER_ID", "mappedGenes"]
 
@@ -848,6 +861,13 @@ def get_snpway_gene_mappings(
     - chrom_pos_ids
     - chromosome range (chromosome_identifier, start_position, end_position)
     - rsid_list
+
+    Returns:
+        dict: A nested response with these top-level keys:
+            - mapping.gene_list: List of unique genes found in the input SNPs.
+            - mapping.variant_gene_map: Mapping from SNP ID (rsID or chr:pos) to associated genes.
+            - panther.gene_info: PANTHER annotations (families, pathways, GO terms) for each gene.
+            - panther.gene_to_panther_map: Mapping from gene symbol to PANTHER protein family ID.
     """
 
     payload = _build_snpway_payload(
@@ -859,12 +879,14 @@ def get_snpway_gene_mappings(
         rsid_list=rsid_list,
     )
 
-    return _post_snpway_request(
+    response_data = _post_snpway_request(
         endpoint="/workflow/gene_mappings",
         payload=payload,
         base_url=base_url,
         timeout_seconds=timeout_seconds,
     )
+
+    return _build_snpway_mapping_response(response_data)
 
 
 def run_snpway_overrepresentation_workflow(
@@ -884,10 +906,22 @@ def run_snpway_overrepresentation_workflow(
     """
     Run full SNPWay overrepresentation workflow and return normalized outputs.
 
-    The backend response is compact; this helper adds convenience views locally:
-    - all overrepresentation results
-    - significant overrepresentation results
-    - CSV-ready all/significant mapping rows
+    The backend response is compact; this helper adds convenience views locally.
+
+    Returns:
+        dict: A nested response with these top-level keys:
+            - mapping.gene_list: List of unique genes found in the input SNPs.
+            - mapping.variant_gene_map: Mapping from SNP ID (rsID or chr:pos) to associated genes.
+            - panther.gene_info: PANTHER annotations (families, pathways, GO terms) for each gene.
+            - panther.gene_to_panther_map: Mapping from gene symbol to PANTHER protein family ID.
+            - overrepresentation.results: All enrichment analysis results from PANTHER.
+            - overrepresentation.significant_results: Only results meeting the significance threshold (FDR or p-value).
+            - overrepresentation.settings: Analysis parameters (annotation dataset, correction method, test type).
+            - overrepresentation.significance_cutoff: The p-value/FDR threshold used to filter significant results.
+            - csv.all_mappings: Table of all SNP-gene-PANTHER associations with selected columns.
+            - csv.all_mappings_all_columns: Table of all SNP-gene-PANTHER associations with complete annotations.
+            - csv.significant_mappings: Table of significant enrichment results with selected columns.
+            - csv.significant_mappings_all_columns: Table of significant enrichment results with complete annotations.
     """
 
     payload = _build_snpway_payload(
@@ -922,25 +956,41 @@ def run_snpway_overrepresentation_workflow(
         response_data.get("gene_panther_mapping", {}), significant_genes
     )
 
-    response_data["overrepresentation_all_results"] = overrepresentation_results
-    response_data["overrepresentation_significant_results"] = significant_results
-    response_data["csv_all_mappings"] = _create_results_table_data(
-        response_data,
-        annotation_dataset=annot_data_set,
-    )
-    response_data["csv_all_mappings_all_columns"] = _create_results_table_data(
-        response_data,
-        annotation_dataset=None,
-    )
-    response_data["csv_significant_mappings"] = _create_results_table_data(
-        response_data,
-        panther_ids_to_include=significant_panther_ids,
-        annotation_dataset=annot_data_set,
-    )
-    response_data["csv_significant_mappings_all_columns"] = _create_results_table_data(
-        response_data,
-        panther_ids_to_include=significant_panther_ids,
-        annotation_dataset=None,
-    )
+    significance_field = "fdr" if str(correction).upper() == "FDR" else "pValue"
 
-    return response_data
+    return {
+        **_build_snpway_mapping_response(response_data),
+        "overrepresentation": {
+            "results": overrepresentation_results,
+            "significant_results": significant_results,
+            "settings": {
+                "annot_data_set": annot_data_set,
+                "correction": correction,
+                "enrichment_test_type": enrichment_test_type,
+            },
+            "significance_cutoff": {
+                "field": significance_field,
+                "p_value": 0.05,
+            },
+        },
+        "csv": {
+            "all_mappings": _create_results_table_data(
+                response_data,
+                annotation_dataset=annot_data_set,
+            ),
+            "all_mappings_all_columns": _create_results_table_data(
+                response_data,
+                annotation_dataset=None,
+            ),
+            "significant_mappings": _create_results_table_data(
+                response_data,
+                panther_ids_to_include=significant_panther_ids,
+                annotation_dataset=annot_data_set,
+            ),
+            "significant_mappings_all_columns": _create_results_table_data(
+                response_data,
+                panther_ids_to_include=significant_panther_ids,
+                annotation_dataset=None,
+            ),
+        },
+    }
