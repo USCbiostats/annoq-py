@@ -13,7 +13,7 @@ from typing import Union, List, Dict, Any, Optional
 
 # Base URL for the Annoq API
 BASE_URL = "https://api-v2.annoq.org"
-DEFAULT_SNPWAY_BASE_URL = "https://enrichment-dev.annoq.org"
+DEFAULT_SNPWAY_BASE_URL = "http://snpway.annoq.org"
 
 
 def _process_fields_param(fields: Union[str, List[str], None]) -> Optional[str]:
